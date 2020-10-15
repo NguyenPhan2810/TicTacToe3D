@@ -15,7 +15,7 @@ class Game:
         self.backgroundColor = (0.2, 0.2, 0.2)
 
         self.isGameRunning = True
-        self.objectList = []
+        self.objectRoot = GameObject()
 
         self.previousMousePosition = np.array([0, 0, 0])
         self.mouseHold = False
@@ -26,8 +26,8 @@ class Game:
         glTranslatef(0,  0, -7)
         glRotatef(22, 1, 0, 0)
 
-        newGameObject = PlayGround()
-        self.objectList += [newGameObject]
+        self.playGround = PlayGround()
+        self.playGround.setParent(self.objectRoot)
 
     def play(self):
         while self.isGameRunning:
@@ -54,11 +54,9 @@ class Game:
 
 
     def update(self):
-        for object in self.objectList:
-            object.update(0.01)
+        self.objectRoot.update(0.01)
 
         if self.mouseHold:
-            rotation = 0
             mousePos = pygame.mouse.get_pos()
             rotation = mousePos[0] - self.previousMousePosition[0]
             self.previousMousePosition = mousePos
@@ -72,8 +70,7 @@ class Game:
         glClearColor(self.backgroundColor[0], self.backgroundColor[1], self.backgroundColor[2], 1)
 
         # Draw to buffer
-        for object in self.objectList:
-            object.render()
+        self.objectRoot.render()
 
         # Display
         pygame.display.flip()
