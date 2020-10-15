@@ -28,7 +28,7 @@ class GLObjectData:
                 glColor3fv(self.surfacesColor[colorIndex])
                 colorIndex += 1
             for vertex in surface:
-                glVertex3fv((self.verticies[vertex] + transform.globalPosition) * transform.globalScale)
+                glVertex3fv((self.verticies[vertex]  * transform.globalScale) + transform.globalPosition)
         glEnd()
 
 
@@ -49,10 +49,10 @@ class GameObject:
     def addChild(self, child):
         self.children += [child]
 
-    def update(self, deltaTime):
+    def update(self, deltaTime: float):
         if self.parent is not None:
             self.transform.globalScale = self.parent.transform.globalScale * self.transform.scale
-            self.transform.globalPosition = self.parent.transform.globalPosition + self.transform.position
+            self.transform.globalPosition = (self.parent.transform.globalPosition + self.transform.position) * self.transform.globalScale
 
         for i in range(0, len(self.children)):
             self.children[i].update(deltaTime)
