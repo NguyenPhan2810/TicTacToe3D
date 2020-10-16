@@ -21,6 +21,7 @@ class MovementState(enum.Enum):
     up = 5
     down = 6
 
+
 class Game:
     def __init__(self):
         pygame.init()

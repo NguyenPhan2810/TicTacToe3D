@@ -1,9 +1,9 @@
-from  gameObject import *
+from gameObject import *
 import GLShapes
 import enum
 import configuration as cfg
 from pygame import time
-from math import sin
+import math
 
 class Title(GameObject):
     class State(enum.Enum):
@@ -11,38 +11,42 @@ class Title(GameObject):
         player1 = 1
         player2 = 2
 
-    def __init__(self,  color = None):
+    def __init__(self, color=None):
         vertx, edges, faces = GLShapes.Square.data()
         GameObject.__init__(self, GLObjectData(vertx, edges, faces, color))
         self.state = Title.State(0)
         self.color = color
 
-    def changeToColor(self, color = None):
+    def changeToColor(self, color=None):
         if color is not None:
             self.meshData.surfacesColor = [color]
             self.color = color
 
-    def changeToState(self,  state: State):
+    def changeToState(self, state: State):
         self.state = state
         color = None
-        if state == Title.State.player1: color = cfg.player1Color
-        elif state == Title.State.player2: color = cfg.player2Color
+        if state == Title.State.player1:
+            color = cfg.player1Color
+        elif state == Title.State.player2:
+            color = cfg.player2Color
         self.changeToColor(color)
 
 
 class Plane(GameObject):
-    def __init__(self, color = None):
+    def __init__(self, color=None):
         GameObject.__init__(self)
         self.titles = []
 
-        loopRange = range(int(-cfg.nTitles/2), int(cfg.nTitles/2+1))
+        loopRange = range(int(-cfg.nTitles / 2), int(cfg.nTitles / 2 + 1))
 
         for x in loopRange:
             row = []
             for z in loopRange:
                 newTitle = Title(color)
-                newTitle.transform.position[0] = self.transform.position[0] + x * (cfg.nTitles + cfg.titlePositionOffset)
-                newTitle.transform.position[2] = self.transform.position[2] + z * (cfg.nTitles + cfg.titlePositionOffset)
+                newTitle.transform.position[0] = self.transform.position[0] + x * (
+                            cfg.nTitles + cfg.titlePositionOffset)
+                newTitle.transform.position[2] = self.transform.position[2] + z * (
+                            cfg.nTitles + cfg.titlePositionOffset)
                 newTitle.setParent(self)
                 row += [newTitle]
             self.titles += [row]
@@ -51,6 +55,11 @@ class Plane(GameObject):
         for i in range(0, len(self.titles)):
             for j in range(0, len(self.titles[i])):
                 self.titles[i][j].changeToColor(color)
+
+
+class Controller:
+    def __init__(self):
+        pass
 
 
 class PlayGround(GameObject):
@@ -68,12 +77,13 @@ class PlayGround(GameObject):
             newPlane.setParent(self)
             self.planes += [newPlane]
 
+        self.selectionCount = 0
         self.activePlane = 1
         self.activeRow = 1
         self.activeCol = 1
         self.setActiveTitle()
 
-    def setActiveTitle(self, plane = None, row = None, col = None):
+    def setActiveTitle(self, plane=None, row=None, col=None):
         if plane is None:
             plane = self.activePlane
         if row is None:
@@ -83,30 +93,163 @@ class PlayGround(GameObject):
 
         title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]
         color = None
-        if title.state == Title.State.player1: color = cfg.player1Color
-        elif title.state == Title.State.player2: color = cfg.player2Color
-        else: color = cfg.surfacesColor[self.activePlane]
+        if title.state == Title.State.player1:
+            color = cfg.player1Color
+        elif title.state == Title.State.player2:
+            color = cfg.player2Color
+        else:
+            color = cfg.surfacesColor[self.activePlane]
 
         title.changeToColor(color)
         self.activePlane = plane
         self.activeRow = row
         self.activeCol = col
 
+    # Return True if selection succeeded false if doesn't
+    # Return End game result if there is end game
     def selectTitle(self, state: Title.State):
         title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]
         if title.state == Title.State.default:
             title.changeToState(state)
+            self.selectionCount += 1
+            result = self.endgameCheck()
+            if result is not None:
+                print(result)
+                return result
             return True
         return False
+
+    # Return None means nothing
+    # Return Title.State.Default means draw
+    # Return Title.State.PlayerX means PlayerX wins
+    def endgameCheck(self):
+        plane = self.activePlane
+        row = self.activeRow
+        col = self.activeCol
+        newestSelection = (plane, row, col)
+        title3dArray = []
+        for i in range(0, cfg.nTitles):
+            title3dArray += [self.planes[i].titles]
+
+        if TerminalCheck(title3dArray, newestSelection):
+            return title3dArray[plane][row][col].state
+        elif self.selectionCount == math.pow(cfg.nTitles, 3):
+            return Title.State.default
+        else:
+            return None
 
     def update(self, deltaTime):
         GameObject.update(self, deltaTime)
 
         title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]
-        color = np.array((0.5, 0.5, 0.5)) + sin(time.get_ticks() / 1000 * cfg.titleBlinkFreq) / 8
+        color = np.array((0.5, 0.5, 0.5)) + math.sin(time.get_ticks() / 1000 * cfg.titleBlinkFreq) / 8
         title.changeToColor(color)
 
-    def getTitleOnClick(self):
-        gluUnProject()
-        return None
 
+# titleArray must be 1d array unwrapped from 3d titles
+def TerminalCheck(title3dArray, newestMoveIndex) -> bool:
+    arr = title3dArray
+    p = newestMoveIndex[0]
+    r = newestMoveIndex[1]
+    c = newestMoveIndex[2]
+    n = cfg.nTitles
+    state = arr[p][r][c].state
+
+    # Check plane
+    for i in range(0, n):
+        if arr[i][r][c].state != state:
+            break
+    else:
+        return True
+
+    # Check row
+    for i in range(0, n):
+        if arr[p][i][c].state != state:
+            break
+    else:
+        return True
+
+    # Check col
+    for i in range(0, n):
+        if arr[p][r][i].state != state:
+            break
+    else:
+        return True
+
+    # Check diagonal
+    if r == c:
+        for i in range(0, n):
+            if arr[p][i][i].state != state:
+                break
+        else:
+            return True
+
+    # Check anti-diagonal
+    if r + c == n - 1:
+        for i in range(0, n):
+            if arr[p][i][n - 1 - i].state != state:
+                break
+        else:
+            return True
+
+    # Check multiplane row
+    if p == r:
+        for i in range(0, n):
+            if arr[i][i][c].state != state:
+                break
+        else:
+            return True
+
+    # Check multiplane anti-row
+    if p + r == n - 1:
+        for i in range(0, n):
+            if arr[n - 1 - i][i][c].state != state:
+                break
+        else:
+            return True
+
+    # Check multiplane col
+    if p == c:
+        for i in range(0, n):
+            if arr[i][r][i].state != state:
+                break
+        else:
+            return True
+
+    # Check multiplane anti-col
+    if p + c == n - 1:
+        for i in range(0, n):
+            if arr[n - 1 - i][r][i].state != state:
+                break
+        else:
+            return True
+
+    # Check multiplane diagonal
+    if r == c:
+        for i in range(0, n):
+            if arr[i][i][i].state != state:
+                break
+        else:
+            return True
+
+        for i in range(0, n):
+            if arr[n - 1 - i][i][i].state != state:
+                break
+        else:
+            return True
+
+    # Check multiplane anti-diagonal
+    if r + c == n - 1:
+        for i in range(0, n):
+            if arr[p][i][n - 1 - i].state != state:
+                break
+        else:
+            return True
+
+        for i in range(0, n):
+            if arr[n - 1 - i][i][n - 1 - i].state != state:
+                break
+        else:
+            return True
+
+    return False
