@@ -49,6 +49,10 @@ class GameObject:
     def addChild(self, child):
         self.children += [child]
 
+    def event(self, pygameEvents):
+        for i in range(0, len(self.children)):
+            self.children[i].event(pygameEvents)
+
     def update(self, deltaTime: float):
         if self.parent is not None:
             self.transform.globalScale = self.parent.transform.globalScale * self.transform.scale

@@ -1,4 +1,4 @@
-from gameObject import *
+from GameObject import *
 import GLShapes
 import enum
 import configuration as cfg
@@ -21,15 +21,6 @@ class Title(GameObject):
         if color is not None:
             self.meshData.surfacesColor = [color]
             self.color = color
-
-    def changeToState(self, state: State):
-        self.state = state
-        color = None
-        if state == Title.State.player1:
-            color = cfg.player1Color
-        elif state == Title.State.player2:
-            color = cfg.player2Color
-        self.changeToColor(color)
 
 
 class Plane(GameObject):
@@ -57,11 +48,6 @@ class Plane(GameObject):
                 self.titles[i][j].changeToColor(color)
 
 
-class Controller:
-    def __init__(self):
-        pass
-
-
 class PlayGround(GameObject):
     def __init__(self):
         GameObject.__init__(self)
@@ -81,7 +67,19 @@ class PlayGround(GameObject):
         self.activePlane = 1
         self.activeRow = 1
         self.activeCol = 1
+
+        self.title3dArray = []
+        for i in range(0, cfg.nTitles):
+            self.title3dArray += [self.planes[i].titles]
+
         self.setActiveTitle()
+
+    def update(self, deltaTime):
+        GameObject.update(self, deltaTime)
+
+        title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]
+        color = np.array((0.5, 0.5, 0.5)) + math.sin(time.get_ticks() / 1000 * cfg.titleBlinkFreq) / 8
+        title.changeToColor(color)
 
     def setActiveTitle(self, plane=None, row=None, col=None):
         if plane is None:
@@ -110,11 +108,14 @@ class PlayGround(GameObject):
     def selectTitle(self, state: Title.State):
         title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]
         if title.state == Title.State.default:
-            title.changeToState(state)
+            title.state = state
             self.selectionCount += 1
+
+            color = cfg.player1Color if state == Title.State.player1 else cfg.player2Color
+            title.changeToColor(color)
+
             result = self.endgameCheck()
             if result is not None:
-                print(result)
                 return result
             return True
         return False
@@ -127,27 +128,17 @@ class PlayGround(GameObject):
         row = self.activeRow
         col = self.activeCol
         newestSelection = (plane, row, col)
-        title3dArray = []
-        for i in range(0, cfg.nTitles):
-            title3dArray += [self.planes[i].titles]
+        title3dArray = self.title3dArray
 
-        if TerminalCheck(title3dArray, newestSelection):
+        if terminalCheck(title3dArray, newestSelection):
             return title3dArray[plane][row][col].state
         elif self.selectionCount == math.pow(cfg.nTitles, 3):
             return Title.State.default
         else:
             return None
 
-    def update(self, deltaTime):
-        GameObject.update(self, deltaTime)
-
-        title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]
-        color = np.array((0.5, 0.5, 0.5)) + math.sin(time.get_ticks() / 1000 * cfg.titleBlinkFreq) / 8
-        title.changeToColor(color)
-
-
 # titleArray must be 1d array unwrapped from 3d titles
-def TerminalCheck(title3dArray, newestMoveIndex) -> bool:
+def terminalCheck(title3dArray, newestMoveIndex) -> bool:
     arr = title3dArray
     p = newestMoveIndex[0]
     r = newestMoveIndex[1]
