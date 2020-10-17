@@ -10,8 +10,8 @@ player1Color = (0, 0, 0)
 player2Color = (255, 255, 255)
 
 nTitles = 3
-titleWiggleAmount = 4
-titleWiggleFrequency = 100
+titleWiggleAmount = 0.05
+titleWiggleFrequency = 20
 titlePositionOffset = -0.4
 planeSpacingMultiplier = 2.4
 playGroundScale = 0.3

@@ -17,16 +17,11 @@ class Title(GameObject):
         GameObject.__init__(self, GLObjectData(vertx, edges, faces, color))
         self.state = Title.State(0)
         self.color = color
-        self.defaultTransform = copy.copy(self.transform)
 
     def changeToColor(self, color=None):
         if color is not None:
             self.meshData.verticesColor = [color]
             self.color = color
-
-    def resetTransform(self):
-        self.transform = copy.copy(self.defaultTransform)
-        pass
 
 class Plane(GameObject):
     def __init__(self, color=None):
@@ -70,6 +65,7 @@ class PlayGround(GameObject):
 
         self.selectionCount = 0
         self.activeTitleIndex = None
+        self.activeTitlePreservedPosition = None
 
         self.title3dArray = []
         for i in range(0, cfg.nTitles):
@@ -112,19 +108,37 @@ class PlayGround(GameObject):
 
         if self.activeTitleIndex is not None:
             title = self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]]
-            deltaMove = math.sin(self.totalTime * cfg.titleWiggleFrequency) * cfg.titleWiggleAmount * deltaTime
-            title.move((deltaMove, 0, 0))
+            dx = cfg.titleWiggleAmount * math.cos(self.totalTime * cfg.titleWiggleFrequency)
+            dz = cfg.titleWiggleAmount * math.sin(self.totalTime * cfg.titleWiggleFrequency)
+            newX = self.activeTitlePreservedPosition[0] + dx
+            newZ = self.activeTitlePreservedPosition[2] + dz
+            title.transform.position[0] = newX
+            title.transform.position[2] = newZ
 
     def setActiveTitle(self, plane=None, row=None, col=None):
+        index = self.activeTitleIndex
+
+        # Prevent recall the function multiple times
+        if index is not None and plane is not None and row is not None and col is not None:
+            if index[0] == plane and index[1] == row and index[2] == col:
+                return
+
+        # Kind of reset if no coordinates are provided
+        if index is not None:
+            oldTitle = self.title3dArray[index[0]][index[1]][index[2]]
+            oldTitle.transform.position = self.activeTitlePreservedPosition
+            self.activeTitlePreservedPosition = None
+            self.activeTitleIndex = None
+
         if plane is None or row is None or col is None:
-            if self.activeTitleIndex is not None:
-                self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]].resetTransform()
-                self.activeTitleIndex = None
             self.totalTime = 0.0
             return
 
-        if self.title3dArray[plane][row][col].state == Title.State.default:
+        # If no players has taken the title yet then choose it
+        newTitle = self.title3dArray[plane][row][col]
+        if newTitle.state == Title.State.default:
             self.activeTitleIndex = [plane, row, col]
+            self.activeTitlePreservedPosition = copy.deepcopy(newTitle.transform.position)
 
 
     # Return True if selection succeeded false if doesn't
