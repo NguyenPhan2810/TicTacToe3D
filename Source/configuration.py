@@ -1,18 +1,19 @@
-surfacesColor = (
-    (0.6, 0.464, 0.65),
-    (0.5, 0.67, 0.7),
-    (0.57, 0.67, 0.5)
+titlesColor = (
+    (120, 210, 189), (121, 210, 189), (122, 210, 189), (123, 210, 189), (124, 210, 189), (125, 210, 189), (126, 210, 189), (127, 210, 189), (128, 210, 189),
+    (124, 79, 101), (124, 79, 102), (124, 79, 103), (124, 79, 104), (124, 79, 105), (124, 79, 106), (124, 79, 107), (124, 79, 108), (124, 79, 109),
+    (180, 219, 89), (181, 219, 89), (182, 219, 89), (183, 219, 89), (184, 219, 89), (185, 219, 89), (186, 219, 89), (187, 219, 89), (188, 219, 89),
 )
 
-backgroundColor = (0.2, 0.2, 0.2)
-activeTitleColor = (0.5, 0.2, 0.3)
+backgroundColor = (51, 51, 51)
+activeTitleColor = (5, 2, 3)
 player1Color = (0, 0, 0)
-player2Color = (1, 1, 1)
+player2Color = (255, 255, 255)
 
 nTitles = 3
-titleBlinkFreq = 20
+titleWiggleAmount = 4
+titleWiggleFrequency = 100
 titlePositionOffset = -0.4
-planeSpacingMultipler = 2.4
+planeSpacingMultiplier = 2.4
 playGroundScale = 0.3
 
 displaySize = (800, 800)
@@ -26,6 +27,6 @@ timePerFrame = 1 / 120
 
 # Min-Max alg
 maxDepthSearch  = 2
-depthWeight = 1
-heuristicWeigh = 1
+depthWeight = 10
+heuristicWeigh = 2
 minmaxEvaluationScore = 1000

@@ -14,21 +14,21 @@ class Transform:
 
 
 class GLObjectData:
-    def __init__(self, verticies, edges, surfaces, surfacesColor=None):
-        self.verticies = np.array(verticies)
+    def __init__(self, vertices, edges, surfaces, verticesColor=None):
+        self.vertices = np.array(vertices)
         self.edges = np.array(edges)
         self.surfaces = np.array(surfaces)
-        self.surfacesColor = surfacesColor
+        self.verticesColor = verticesColor
 
     def render(self, transform: Transform):
+        if self.verticesColor is None:
+            return
+
         glBegin(GL_QUADS)
-        colorIndex = 0
         for surface in self.surfaces:
-            if self.surfacesColor is not None:
-                glColor3fv(self.surfacesColor[colorIndex])
-                colorIndex += 1
             for vertex in surface:
-                glVertex3fv((self.verticies[vertex]  * transform.globalScale) + transform.globalPosition)
+                glColor3fv(np.array(self.verticesColor) / 255)
+                glVertex3fv((self.vertices[vertex] * transform.globalScale) + transform.globalPosition)
         glEnd()
 
 
@@ -48,6 +48,10 @@ class GameObject:
 
     def addChild(self, child):
         self.children += [child]
+
+    def reset(self):
+        for i in range(0, len(self.children)):
+            self.children[i].reset()
 
     def event(self, pygameEvents):
         for i in range(0, len(self.children)):

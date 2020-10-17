@@ -154,27 +154,29 @@ def Heuristic(title3dArray, minTitleState, maxTitleState):
     # maxCount and minCount squared means the more titles in a row the weigher the score is
     # minus totalNoneCount means the less None Title the weigher the score is
     # 2 * totalMinCount because 2 minTitle in a row is the most dangerous
-    score = cfg.heuristicWeigh * (totalMaxCount + totalMinCount - totalNoneCount)
+    score = (totalMaxCount + totalMinCount - totalNoneCount)
 
     return score
 
 
 # Reference https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-3-tic-tac-toe-ai-finding-optimal-move/
-# Optimization technique used: Alpha-beta pruning
-def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, isMax = False, alpha = -math.inf, beta = math.inf):
+# Reference https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
+# Optimization technique used: Alpha-beta pruning, max depth restriction, heuristic function
+def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, isMax = False, alpha = -math.inf, beta = math.inf,
+           maxDepth = cfg.maxDepthSearch, depthWeigh = cfg.depthWeight, heuristicWeigh = cfg.heuristicWeigh):
     score = 0
     n = cfg.nTitles
 
     # Evaluation
     if PlayGround.terminalCheck(title3dArray, newestMove) == True: # Somebody won
-        score = cfg.minmaxEvaluationScore - depth * cfg.depthWeight
+        score = cfg.minmaxEvaluationScore - depth * depthWeigh
         if title3dArray[newestMove[0]][newestMove[1]][newestMove[2]].state == maxTitleState:
             return  score # if it is max turn and the title state is max or else
         else:
             return -score # if it is max turn and the title state is min or else
 
-    if depth >= cfg.maxDepthSearch:
-        return Heuristic(title3dArray, minTitleState, maxTitleState)
+    if depth >= maxDepth:
+        return Heuristic(title3dArray, minTitleState, maxTitleState) * heuristicWeigh
 
     best = 0
     movecount = 0
@@ -193,7 +195,8 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     title.state = maxTitleState
 
                     # recursively calculate evaluation and take the highest one
-                    best = max(best, MinMax(title3dArray, (p, r, c), minTitleState, maxTitleState, depth + 1, not isMax, alpha, beta))
+                    best = max(best, MinMax(title3dArray, (p, r, c), minTitleState, maxTitleState, depth + 1, not isMax, alpha, beta,
+                                            maxDepth, depthWeigh, heuristicWeigh))
                     alpha = max(alpha, best)
 
                     # undo the move
@@ -218,7 +221,8 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     title.state = minTitleState
 
                     # recursively calculate evaluation and take the lowest one
-                    best = min(best, MinMax(title3dArray, (p, r, c), minTitleState, maxTitleState, depth + 1, not isMax, alpha, beta))
+                    best = min(best, MinMax(title3dArray, (p, r, c), minTitleState, maxTitleState, depth + 1, not isMax, alpha, beta,
+                                            maxDepth, depthWeigh, heuristicWeigh))
                     beta = min(beta, best)
 
                     # undo the move

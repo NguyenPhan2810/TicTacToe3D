@@ -4,6 +4,7 @@ import enum
 import configuration as cfg
 from pygame import time
 import math
+import copy
 
 class Title(GameObject):
     class State(enum.Enum):
@@ -16,12 +17,16 @@ class Title(GameObject):
         GameObject.__init__(self, GLObjectData(vertx, edges, faces, color))
         self.state = Title.State(0)
         self.color = color
+        self.defaultTransform = copy.copy(self.transform)
 
     def changeToColor(self, color=None):
         if color is not None:
-            self.meshData.surfacesColor = [color]
+            self.meshData.verticesColor = [color]
             self.color = color
 
+    def resetTransform(self):
+        self.transform = copy.copy(self.defaultTransform)
+        pass
 
 class Plane(GameObject):
     def __init__(self, color=None):
@@ -47,66 +52,88 @@ class Plane(GameObject):
             for j in range(0, len(self.titles[i])):
                 self.titles[i][j].changeToColor(color)
 
-
 class PlayGround(GameObject):
     def __init__(self):
         GameObject.__init__(self)
+
+        self.totalTime = 0.0
 
         self.planes = []
         for y in range(-1, 2):
             i = y + 1
             vertx = GLShapes.Square.verticies()
             newPlane = Plane()
-            newPlane.changeToColor(cfg.surfacesColor[i])
-            newPlane.move((0, y * cfg.planeSpacingMultipler, 0))
+            newPlane.move((0, y * cfg.planeSpacingMultiplier, 0))
             newPlane.transform.scale = cfg.playGroundScale
             newPlane.setParent(self)
             self.planes += [newPlane]
 
         self.selectionCount = 0
-        self.activePlane = 1
-        self.activeRow = 1
-        self.activeCol = 1
+        self.activeTitleIndex = None
 
         self.title3dArray = []
         for i in range(0, cfg.nTitles):
             self.title3dArray += [self.planes[i].titles]
 
+        # Setup color
+        index = 0
+        for i in range(0, cfg.nTitles):
+            for j in range(0, cfg.nTitles):
+                for k in range(0, cfg.nTitles):
+                    title = self.title3dArray[i][j][k]
+                    title.changeToColor(cfg.titlesColor[index])
+                    index += 1
+
         self.setActiveTitle()
+
+    def reset(self):
+        GameObject.reset(self)
+
+        self.totalTime = 0.0
+
+        for i in range(0, cfg.nTitles):
+            for j in range(0, cfg.nTitles):
+                for k in range(0, cfg.nTitles):
+                    self.title3dArray[i][j][k].state = Title.State.default
+
+    def resetColor(self):
+        index = 0
+        for i in range(0, cfg.nTitles):
+            for j in range(0, cfg.nTitles):
+                for k in range(0, cfg.nTitles):
+                    title = self.title3dArray[i][j][k]
+                    title.resetColor()
+                    index += 1
 
     def lateUpdate(self, deltaTime):
         GameObject.update(self, deltaTime)
 
-        title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]
-        color = np.array((0.5, 0.5, 0.5)) + math.sin(time.get_ticks() / 1000 * cfg.titleBlinkFreq) / 8
-        title.changeToColor(color)
+        self.totalTime += deltaTime
+
+        if self.activeTitleIndex is not None:
+            title = self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]]
+            deltaMove = math.sin(self.totalTime * cfg.titleWiggleFrequency) * cfg.titleWiggleAmount * deltaTime
+            title.move((deltaMove, 0, 0))
 
     def setActiveTitle(self, plane=None, row=None, col=None):
-        if plane is None:
-            plane = self.activePlane
-        if row is None:
-            row = self.activePlane
-        if col is None:
-            col = self.activePlane
+        if plane is None or row is None or col is None:
+            if self.activeTitleIndex is not None:
+                self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]].resetTransform()
+                self.activeTitleIndex = None
+            self.totalTime = 0.0
+            return
 
-        title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]
-        color = None
-        if title.state == Title.State.player1:
-            color = cfg.player1Color
-        elif title.state == Title.State.player2:
-            color = cfg.player2Color
-        else:
-            color = cfg.surfacesColor[self.activePlane]
+        if self.title3dArray[plane][row][col].state == Title.State.default:
+            self.activeTitleIndex = [plane, row, col]
 
-        title.changeToColor(color)
-        self.activePlane = plane
-        self.activeRow = row
-        self.activeCol = col
 
     # Return True if selection succeeded false if doesn't
     # Return End game result if there is end game
     def selectTitle(self, state: Title.State):
-        title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]
+        if self.activeTitleIndex is None:
+            return
+
+        title = self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]]
         if title.state == Title.State.default:
             title.state = state
             self.selectionCount += 1
@@ -115,6 +142,7 @@ class PlayGround(GameObject):
             title.changeToColor(color)
 
             result = self.endgameCheck()
+            self.activeTitleIndex = None
             if result is not None:
                 return result
             return True
@@ -124,9 +152,9 @@ class PlayGround(GameObject):
     # Return Title.State.Default means draw
     # Return Title.State.PlayerX means PlayerX wins
     def endgameCheck(self):
-        plane = self.activePlane
-        row = self.activeRow
-        col = self.activeCol
+        plane = self.activeTitleIndex[0]
+        row = self.activeTitleIndex[1]
+        col = self.activeTitleIndex[2]
         newestSelection = (plane, row, col)
         title3dArray = self.title3dArray
 

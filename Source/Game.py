@@ -4,6 +4,7 @@ import pygame
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import *
 import configuration as cfg
 import enum
 from Controller import HumanController, MinMaxController
@@ -39,25 +40,34 @@ class Game:
         glRotatef(cfg.cameraXRotate, 1, 0, 0)
 
     def play(self):
-        self.state = GameState.player1
-
-        prevTime = pygame.time.get_ticks()
         while self.isGameRunning:
-            # Time
-            currentTime = pygame.time.get_ticks()
-            dt = (currentTime - prevTime) / 1000
-            if dt < cfg.timePerFrame:
-                pygame.time.wait(int((cfg.timePerFrame - dt) * 1000))
-                dt = cfg.timePerFrame
+            self.state = GameState.player1
+            prevTime = pygame.time.get_ticks()
 
-            prevTime = currentTime
-            # Events
-            self.eventHandling()
-            # Update
-            self.update(dt)
-            self.lateUpdate(dt)
-            # Render
-            self.render()
+            isGamePlaying = True
+            while self.isGameRunning and isGamePlaying:
+                # Time
+                currentTime = pygame.time.get_ticks()
+                dt = (currentTime - prevTime) / 1000
+                if dt < cfg.timePerFrame:
+                    pygame.time.wait(int((cfg.timePerFrame - dt) * 1000))
+                    dt = cfg.timePerFrame
+
+                prevTime = currentTime
+                # Events
+                self.eventHandling()
+                # Update
+                isGamePlaying = self.update(dt)
+                self.lateUpdate(dt)
+                # Render
+                self.render()
+
+            if self.isGameRunning:
+                pygame.time.wait(2000)
+                self.objectRoot.reset()
+
+    def reset(self):
+        self.objectRoot.reset()
 
     def eventHandling(self):
         events = pygame.event.get()
@@ -74,7 +84,7 @@ class Game:
 
         self.objectRoot.event(events)
 
-    def update(self, deltaTime: float):
+    def update(self, deltaTime: float) -> bool:
         self.objectRoot.update(deltaTime)
 
         if self.mouseHold:
@@ -87,8 +97,11 @@ class Game:
 
         playerIndex = 0 if self.state == self.state.player1 else 1
         activeTitle = self.players[playerIndex].activeTitle(self.playGround.title3dArray, self.state)
+        print(activeTitle)
         if activeTitle is not None:
             self.playGround.setActiveTitle(activeTitle[0], activeTitle[1], activeTitle[2])
+        else:
+            self.playGround.setActiveTitle()
         if self.players[playerIndex].selectTitle() and activeTitle is not None:
             titleSelected = activeTitle
             titleState = None
@@ -103,6 +116,8 @@ class Game:
                 elif titleState == Title.State.player2: self.state = self.state.player1
             elif type(checkState) is not bool:
                 print(checkState)
+                return False
+        return True
 
     def lateUpdate(self, deltaTime: float):
         self.objectRoot.lateUpdate(deltaTime)
@@ -110,7 +125,7 @@ class Game:
     def render(self):
         # Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glClearColor(cfg.backgroundColor[0], cfg.backgroundColor[1], cfg.backgroundColor[2], 1)
+        glClearColor(cfg.backgroundColor[0] / 255, cfg.backgroundColor[1] / 255, cfg.backgroundColor[2] / 255, 1)
 
         # Draw to buffer
         self.objectRoot.render()

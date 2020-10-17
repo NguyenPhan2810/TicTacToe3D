@@ -2,8 +2,8 @@ from GameObject import *
 import pygame
 from PlayGround import *
 import configuration as cfg
+import numpy as np
 from MinMaxAlgorithm import MinMax
-
 
 class Controller(GameObject):
     def __init__(self):
@@ -22,24 +22,34 @@ class HumanController(Controller):
         Controller.__init__(self)
 
         self.isSelectTitle = False
-        self.activePlane = self.activeRow = self.activeCol = 1
+        self.isMouseMoved = False
+        self.isMouseUp = False
+        self.pickingTitle = None
+
+    def reset(self):
+        GameObject.reset(self)
+        self.pickingTitle = None
 
     def event(self, pygameEvents):
         Controller.event(self, pygameEvents)
 
+        self.isMouseUp = False
         n = cfg.nTitles
         for event in pygameEvents:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_f: self.isSelectTitle = True
-                elif event.key == pygame.K_a: self.activeRow = max(0, self.activeRow - 1)
-                elif event.key == pygame.K_d: self.activeRow = min(n - 1, self.activeRow + 1)
-                elif event.key == pygame.K_w: self.activeCol = max(0, self.activeCol - 1)
-                elif event.key == pygame.K_s: self.activeCol = min(n - 1, self.activeCol + 1)
-                elif event.key == pygame.K_SPACE: self.activePlane = min(n - 1, self.activePlane + 1)
-                elif event.key == pygame.K_LCTRL: self.activePlane = max(0, self.activePlane - 1)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.isMouseMoved = False
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.isMouseUp = True
+            elif event.type == pygame.MOUSEMOTION:
+                self.isMouseMoved = True
 
     def update(self, deltaTime: float):
         Controller.update(self, deltaTime)
+
+        if self.isMouseMoved:
+            self.mouseHover()
+        if self.isMouseUp and not self.isMouseMoved:
+            self.mouseClick()
 
     def selectTitle(self) -> bool:
         if self.isSelectTitle:
@@ -48,13 +58,50 @@ class HumanController(Controller):
         return False
 
     def activeTitle(self, title3dArray, gameState):
-        return (self.activePlane, self.activeRow, self.activeCol)
+        return self.pickingTitle
+
+    def mouseHover(self):
+        x, y = pygame.mouse.get_pos()
+        y = cfg.displaySize[1] - y # This is to match OpenGL and pygame up
+        r,g,b = glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
+        pixelColor = (r, g, b)
+
+        i = 0
+        n = cfg.nTitles
+        colorIndex = 0
+        for i in range(0, n):
+            for j in range(0, n):
+                for k in range(0, n):
+                    color = cfg.titlesColor[colorIndex]
+                    if pixelColor[0] == color[0] and pixelColor[1] == color[1] and pixelColor[2] == color[2]:
+                        self.pickingTitle = [i, j, k]
+                        break
+                    colorIndex += 1
+                else: continue
+                break
+            else: continue
+            break
+        else:
+            self.pickingTitle = None
+
+    def mouseClick(self):
+        self.isSelectTitle = True
 
 class MinMaxController(Controller):
-    def __init__(self):
+    def __init__(self, maxDepthSearch = cfg.maxDepthSearch, depthWeight = cfg.depthWeight, heuristicWeigh = cfg.heuristicWeigh, evaluationScore = cfg.minmaxEvaluationScore):
         GameObject.__init__(self)
+        self.isSelectTitle = False
+        self.timeTaken = 0.0
+
+        self.maxDepth = maxDepthSearch
+        self.depthWeigh = depthWeight
+        self.heuristicWeigh = heuristicWeigh
+        self.evaluationScore = evaluationScore
 
     def activeTitle(self, title3dArray, gameState):
+        if self.isSelectTitle:
+            self.timeTaken = 0.0
+
         bestMove = None
         bestEvaluation = -math.inf
         n = cfg.nTitles
@@ -78,7 +125,10 @@ class MinMaxController(Controller):
 
                     preserveState = copy.copy(title.state)
                     title.state = playerTitleState
-                    moveEvaluation = MinMax(title3dArray, (p, r, c), oponentTitleState, playerTitleState, isMax=False)
+                    moveEvaluation = MinMax(title3dArray, (p, r, c),
+                                            minTitleState=oponentTitleState,
+                                            maxTitleState=playerTitleState,
+                                            isMax=False)
                     title.state = preserveState
 
                     if moveEvaluation > bestEvaluation:
@@ -88,4 +138,15 @@ class MinMaxController(Controller):
         return bestMove
 
     def selectTitle(self) -> bool:
-        return True
+        if self.isSelectTitle:
+            self.isSelectTitle = False
+            return True
+        return False
+
+    def update(self, deltaTime: float):
+        Controller.update(self, deltaTime)
+        self.timeTaken += deltaTime
+
+        if self.timeTaken > 1.5:
+            self.timeTaken = 0.0
+            self.isSelectTitle = True
