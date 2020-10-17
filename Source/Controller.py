@@ -78,7 +78,7 @@ class MinMaxController(Controller):
 
                     preserveState = copy.copy(title.state)
                     title.state = playerTitleState
-                    moveEvaluation = MinMax(title3dArray, (p, r, c), oponentTitleState, playerTitleState)
+                    moveEvaluation = MinMax(title3dArray, (p, r, c), oponentTitleState, playerTitleState, isMax=False)
                     title.state = preserveState
 
                     if moveEvaluation > bestEvaluation:

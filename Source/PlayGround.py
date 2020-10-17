@@ -74,7 +74,7 @@ class PlayGround(GameObject):
 
         self.setActiveTitle()
 
-    def update(self, deltaTime):
+    def lateUpdate(self, deltaTime):
         GameObject.update(self, deltaTime)
 
         title = self.planes[self.activePlane].titles[self.activeRow][self.activeCol]

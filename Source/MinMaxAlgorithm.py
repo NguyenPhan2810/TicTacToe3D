@@ -154,25 +154,26 @@ def Heuristic(title3dArray, minTitleState, maxTitleState):
     # maxCount and minCount squared means the more titles in a row the weigher the score is
     # minus totalNoneCount means the less None Title the weigher the score is
     # 2 * totalMinCount because 2 minTitle in a row is the most dangerous
-    score = cfg.heuristicBaseScore * (totalMaxCount + 2 * totalMinCount - totalNoneCount)
+    score = cfg.heuristicWeigh * (totalMaxCount + totalMinCount - totalNoneCount)
 
     return score
 
 
 # Reference https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-3-tic-tac-toe-ai-finding-optimal-move/
 # Optimization technique used: Alpha-beta pruning
-def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, isMax = True, alpha = -math.inf, beta = math.inf):
+def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, isMax = False, alpha = -math.inf, beta = math.inf):
     score = 0
     n = cfg.nTitles
 
     # Evaluation
     if PlayGround.terminalCheck(title3dArray, newestMove) == True: # Somebody won
+        score = cfg.minmaxEvaluationScore - depth * cfg.depthWeight
         if title3dArray[newestMove[0]][newestMove[1]][newestMove[2]].state == maxTitleState:
-            return cfg.minmaxEvaluationScore - depth * cfg.depthWeight # I want steps to be smallest
+            return  score # if it is max turn and the title state is max or else
         else:
-            return -cfg.minmaxEvaluationScore - depth * cfg.depthWeight
+            return -score # if it is max turn and the title state is min or else
 
-    if depth > cfg.maxDepthSearch:
+    if depth >= cfg.maxDepthSearch:
         return Heuristic(title3dArray, minTitleState, maxTitleState)
 
     best = 0

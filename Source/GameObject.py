@@ -61,6 +61,10 @@ class GameObject:
         for i in range(0, len(self.children)):
             self.children[i].update(deltaTime)
 
+    def lateUpdate(self, deltaTime: float):
+        for i in range(0, len(self.children)):
+            self.children[i].lateUpdate(deltaTime)
+
     def render(self):
         if self.meshData is not None:
             self.meshData.render(self.transform)

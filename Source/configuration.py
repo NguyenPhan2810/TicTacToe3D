@@ -26,6 +26,6 @@ timePerFrame = 1 / 120
 
 # Min-Max alg
 maxDepthSearch  = 2
-depthWeight = 100
-heuristicBaseScore = 10
-minmaxEvaluationScore = 10000
+depthWeight = 1
+heuristicWeigh = 1
+minmaxEvaluationScore = 1000

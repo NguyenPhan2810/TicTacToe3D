@@ -55,6 +55,7 @@ class Game:
             self.eventHandling()
             # Update
             self.update(dt)
+            self.lateUpdate(dt)
             # Render
             self.render()
 
@@ -86,8 +87,9 @@ class Game:
 
         playerIndex = 0 if self.state == self.state.player1 else 1
         activeTitle = self.players[playerIndex].activeTitle(self.playGround.title3dArray, self.state)
-        self.playGround.setActiveTitle(activeTitle[0], activeTitle[1], activeTitle[2])
-        if self.players[playerIndex].selectTitle():
+        if activeTitle is not None:
+            self.playGround.setActiveTitle(activeTitle[0], activeTitle[1], activeTitle[2])
+        if self.players[playerIndex].selectTitle() and activeTitle is not None:
             titleSelected = activeTitle
             titleState = None
             if self.state == GameState.player1: titleState = Title.State.player1
@@ -101,6 +103,9 @@ class Game:
                 elif titleState == Title.State.player2: self.state = self.state.player1
             elif type(checkState) is not bool:
                 print(checkState)
+
+    def lateUpdate(self, deltaTime: float):
+        self.objectRoot.lateUpdate(deltaTime)
 
     def render(self):
         # Clear screen
