@@ -72,13 +72,7 @@ class PlayGround(GameObject):
             self.title3dArray += [self.planes[i].titles]
 
         # Setup color
-        index = 0
-        for i in range(0, cfg.nTitles):
-            for j in range(0, cfg.nTitles):
-                for k in range(0, cfg.nTitles):
-                    title = self.title3dArray[i][j][k]
-                    title.changeToColor(cfg.titlesColor[index])
-                    index += 1
+        self.resetColor()
 
         self.setActiveTitle()
 
@@ -92,13 +86,15 @@ class PlayGround(GameObject):
                 for k in range(0, cfg.nTitles):
                     self.title3dArray[i][j][k].state = Title.State.default
 
+        self.resetColor()
+
     def resetColor(self):
         index = 0
         for i in range(0, cfg.nTitles):
             for j in range(0, cfg.nTitles):
                 for k in range(0, cfg.nTitles):
                     title = self.title3dArray[i][j][k]
-                    title.resetColor()
+                    title.changeToColor(cfg.titlesColor[index])
                     index += 1
 
     def lateUpdate(self, deltaTime):
@@ -156,7 +152,7 @@ class PlayGround(GameObject):
             title.changeToColor(color)
 
             result = self.endgameCheck()
-            self.activeTitleIndex = None
+            self.setActiveTitle()
             if result is not None:
                 return result
             return True

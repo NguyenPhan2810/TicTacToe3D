@@ -15,6 +15,8 @@ titleWiggleFrequency = 20
 titlePositionOffset = -0.4
 planeSpacingMultiplier = 2.4
 playGroundScale = 0.3
+heuristicMaxWeigh = 1.1
+heuristicMinWeigh = 1
 
 displaySize = (800, 800)
 displayAspectRatio = displaySize[0] / displaySize[1]
@@ -26,7 +28,10 @@ cameraXRotate = 22
 timePerFrame = 1 / 120
 
 # Min-Max alg
-maxDepthSearch  = 2
+maxDepthSearch  = 1
 depthWeight = 10
 heuristicWeigh = 2
-minmaxEvaluationScore = 1000
+minmaxEvaluationScore = 10000
+
+# MinMaxController
+timeProportionRandomMove = 0.7

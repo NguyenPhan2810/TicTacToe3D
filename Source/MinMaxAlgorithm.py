@@ -154,7 +154,7 @@ def Heuristic(title3dArray, minTitleState, maxTitleState):
     # maxCount and minCount squared means the more titles in a row the weigher the score is
     # minus totalNoneCount means the less None Title the weigher the score is
     # 2 * totalMinCount because 2 minTitle in a row is the most dangerous
-    score = (totalMaxCount + totalMinCount - totalNoneCount)
+    score = (totalMaxCount * cfg.heuristicMaxWeigh + totalMinCount * cfg.heuristicMinWeigh - totalNoneCount)
 
     return score
 
@@ -171,14 +171,13 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
     if PlayGround.terminalCheck(title3dArray, newestMove) == True: # Somebody won
         score = cfg.minmaxEvaluationScore - depth * depthWeigh
         if title3dArray[newestMove[0]][newestMove[1]][newestMove[2]].state == maxTitleState:
-            return  score # if it is max turn and the title state is max or else
+            return  score
         else:
-            return -score # if it is max turn and the title state is min or else
+            return -score
 
     if depth >= maxDepth:
         return Heuristic(title3dArray, minTitleState, maxTitleState) * heuristicWeigh
 
-    best = 0
     movecount = 0
     if isMax:
         best = -math.inf
@@ -205,7 +204,7 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     # Alpha beta pruning
                     if beta <= alpha:
                         break
-
+        score += best
     else:
         best = math.inf
         for p in range(0, n):
@@ -231,5 +230,5 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     # Alpha beta pruning
                     if beta <= alpha:
                         break
-
-    return best if movecount > 0 else 0
+        score += best
+    return score if movecount > 0 else 0

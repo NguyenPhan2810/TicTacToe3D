@@ -23,7 +23,7 @@ class Game:
         self.isGameRunning = True
         self.state = GameState(0)
         self.objectRoot = GameObject()
-        self.players = [HumanController(), MinMaxController()]
+        self.players = [MinMaxController(maxDepthSearch=1), MinMaxController(maxDepthSearch=2)]
         self.playGround = PlayGround()
         self.playGround.setParent(self.objectRoot)
         for player in self.players:
@@ -63,7 +63,7 @@ class Game:
                 self.render()
 
             if self.isGameRunning:
-                pygame.time.wait(2000)
+                pygame.time.wait(5000)
                 self.objectRoot.reset()
 
     def reset(self):
@@ -97,7 +97,6 @@ class Game:
 
         playerIndex = 0 if self.state == self.state.player1 else 1
         activeTitle = self.players[playerIndex].activeTitle(self.playGround.title3dArray, self.state)
-        print(activeTitle)
         if activeTitle is not None:
             self.playGround.setActiveTitle(activeTitle[0], activeTitle[1], activeTitle[2])
         else:
