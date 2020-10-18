@@ -92,15 +92,16 @@ class HumanController(Controller):
 class MinMaxController(Controller):
     def __init__(self, maxDepthSearch = cfg.maxDepthSearch, depthWeight = cfg.depthWeight, heuristicWeigh = cfg.heuristicWeigh, evaluationScore = cfg.minmaxEvaluationScore):
         GameObject.__init__(self)
+        self.isStartCalculating = False
         self.findBestMoveThread = None
         self.availableTitle = None
 
         self.isSelectTitle = False
         self.timeTaken = 0.0
-        self.maxTimeWait = 5
+        self.maxTimeWait = cfg.waitingTime
         self.isCalculating = False
         self.randomTimeWait = 0
-        self.maxRandomTimeWait = 0.5
+        self.maxRandomTimeInterval = cfg.waitingRandomTimeInterval
 
         self.maxDepth = maxDepthSearch
         self.depthWeigh = depthWeight
@@ -111,7 +112,6 @@ class MinMaxController(Controller):
         self.currentRandomMove = None
 
     def activeTitle(self, title3dArray, gameState):
-
         if self.availableTitle is None:
             self.prepareAvailableMove(title3dArray)
 
@@ -122,6 +122,10 @@ class MinMaxController(Controller):
             self.findBestMoveThread = None
 
         self.isCalculating = self.bestMove is None
+
+        if not self.isStartCalculating and self.isCalculating and not self.isSelectTitle:
+            self.isStartCalculating = True
+            self.timeTaken = 0.0
 
         if self.timeTaken < self.maxTimeWait * cfg.timeProportionRandomMove or self.isCalculating:
             self.getRandomMove()
@@ -136,6 +140,7 @@ class MinMaxController(Controller):
             self.isCalculating = False
             self.availableTitle = None
             self.timeTaken = 0.0
+            self.isStartCalculating = False
             return True
         return False
 
@@ -190,7 +195,7 @@ class MinMaxController(Controller):
                     self.availableTitle += [[p, r, c]]
 
     def getRandomMove(self):
-        if self.randomTimeWait < self.maxRandomTimeWait:
+        if self.randomTimeWait < self.maxRandomTimeInterval:
             return self.currentRandomMove
 
         self.randomTimeWait = 0
@@ -198,9 +203,10 @@ class MinMaxController(Controller):
 
     def update(self, deltaTime: float):
         Controller.update(self, deltaTime)
+
         self.timeTaken += deltaTime
         self.randomTimeWait += deltaTime
 
-        if self.timeTaken > self.maxTimeWait:
+        if self.timeTaken > self.maxTimeWait and not self.isSelectTitle and self.isStartCalculating:
             self.isSelectTitle = True
 

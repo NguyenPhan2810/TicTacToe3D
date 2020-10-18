@@ -168,7 +168,7 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
     n = cfg.nTitles
 
     # Evaluation
-    if PlayGround.terminalCheck(title3dArray, newestMove) == True: # Somebody won
+    if PlayGround.terminalCheck(title3dArray, newestMove) is not None: # Somebody won
         score = cfg.minmaxEvaluationScore - depth * depthWeigh
         if title3dArray[newestMove[0]][newestMove[1]][newestMove[2]].state == maxTitleState:
             return  score

@@ -23,7 +23,7 @@ class Game:
         self.isGameRunning = True
         self.state = GameState(0)
         self.objectRoot = GameObject()
-        self.players = [HumanController(), MinMaxController(maxDepthSearch=2)]
+        self.players = [MinMaxController(), MinMaxController()]
         self.playGround = PlayGround()
         self.playGround.setParent(self.objectRoot)
         for player in self.players:
@@ -139,4 +139,3 @@ class Game:
                     self.state = self.state.player1
             elif type(checkState) is not bool:
                 self.state = GameState.gameOver
-                print(checkState)

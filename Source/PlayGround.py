@@ -51,6 +51,8 @@ class PlayGround(GameObject):
     def __init__(self):
         GameObject.__init__(self)
 
+        self.terminalTitlesColor = None
+        self.terminalTitles = None
         self.totalTime = 0.0
 
         self.planes = []
@@ -111,6 +113,18 @@ class PlayGround(GameObject):
             title.transform.position[0] = newX
             title.transform.position[2] = newZ
 
+        if self.terminalTitles is not None:
+            for index in self.terminalTitles:
+                title = self.title3dArray[index[0]][index[1]][index[2]]
+                if self.terminalTitlesColor is None:
+                    self.terminalTitlesColor = title.color
+                r, g, b = self.terminalTitlesColor
+                change = math.sin(self.totalTime * cfg.terminalTitleColorChangeFreq) * cfg.terminalTitleColorChangeAmount
+                r += change
+                g += change
+                b += change
+                title.changeToColor((r, g, b))
+
     def setActiveTitle(self, plane=None, row=None, col=None):
         index = self.activeTitleIndex
 
@@ -141,7 +155,7 @@ class PlayGround(GameObject):
     # Return End game result if there is end game
     def selectTitle(self, state: Title.State):
         if self.activeTitleIndex is None:
-            return
+            return False
 
         title = self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]]
         if title.state == Title.State.default:
@@ -168,7 +182,8 @@ class PlayGround(GameObject):
         newestSelection = (plane, row, col)
         title3dArray = self.title3dArray
 
-        if terminalCheck(title3dArray, newestSelection):
+        self.terminalTitles = terminalCheck(title3dArray, newestSelection)
+        if self.terminalTitles is not None:
             return title3dArray[plane][row][col].state
         elif self.selectionCount == math.pow(cfg.nTitles, 3):
             return Title.State.default
@@ -178,7 +193,7 @@ class PlayGround(GameObject):
 # titleArray must be 1d array unwrapped from 3d titles
 # Return None if terminal condition meet
 
-def terminalCheck(title3dArray, newestMoveIndex) -> bool:
+def terminalCheck(title3dArray, newestMoveIndex):
     arr = title3dArray
     p = newestMoveIndex[0]
     r = newestMoveIndex[1]
@@ -187,100 +202,126 @@ def terminalCheck(title3dArray, newestMoveIndex) -> bool:
     state = arr[p][r][c].state
 
     # Check plane
+    terminalTitles = []
     for i in range(0, n):
         if arr[i][r][c].state != state:
             break
+        terminalTitles += [[i, r, c]]
     else:
-        return True
+        return terminalTitles
 
     # Check row
+    terminalTitles = []
     for i in range(0, n):
         if arr[p][i][c].state != state:
             break
+        terminalTitles += [[p, i, c]]
     else:
-        return True
+        return terminalTitles
 
     # Check col
+    terminalTitles = []
     for i in range(0, n):
         if arr[p][r][i].state != state:
             break
+        terminalTitles += [[p, r, i]]
     else:
-        return True
+        return terminalTitles
 
     # Check diagonal
     if r == c:
+        terminalTitles = []
         for i in range(0, n):
             if arr[p][i][i].state != state:
                 break
+            terminalTitles += [[p, i, i]]
         else:
-            return True
+            return terminalTitles
 
     # Check anti-diagonal
     if r + c == n - 1:
+        terminalTitles = []
         for i in range(0, n):
             if arr[p][i][n - 1 - i].state != state:
                 break
+            terminalTitles += [[p, i, n - 1 - i]]
         else:
-            return True
+            return terminalTitles
 
     # Check multiplane row
     if p == r:
+        terminalTitles = []
         for i in range(0, n):
             if arr[i][i][c].state != state:
                 break
+            terminalTitles += [[i, i, c]]
         else:
-            return True
+            return terminalTitles
 
     # Check multiplane anti-row
     if p + r == n - 1:
+        terminalTitles = []
         for i in range(0, n):
             if arr[n - 1 - i][i][c].state != state:
                 break
+            terminalTitles += [[n - 1 - i, i, c]]
         else:
-            return True
+            return terminalTitles
 
     # Check multiplane col
     if p == c:
+        terminalTitles = []
         for i in range(0, n):
             if arr[i][r][i].state != state:
                 break
+            terminalTitles += [[i, r, i]]
         else:
-            return True
+            return terminalTitles
 
     # Check multiplane anti-col
     if p + c == n - 1:
+        terminalTitles = []
         for i in range(0, n):
             if arr[n - 1 - i][r][i].state != state:
                 break
+            terminalTitles += [[n - 1 - i, r, i]]
         else:
-            return True
+            return terminalTitles
 
     # Check multiplane diagonal
     if r == c:
+        terminalTitles = []
         for i in range(0, n):
             if arr[i][i][i].state != state:
                 break
+            terminalTitles += [[i, i, i]]
         else:
-            return True
+            return terminalTitles
 
+        terminalTitles = []
         for i in range(0, n):
             if arr[n - 1 - i][i][i].state != state:
                 break
+            terminalTitles += [[n - 1 - i, i, i]]
         else:
-            return True
+            return terminalTitles
 
     # Check multiplane anti-diagonal
     if r + c == n - 1:
+        terminalTitles = []
         for i in range(0, n):
             if arr[p][i][n - 1 - i].state != state:
                 break
+            terminalTitles += [[p, i, n - 1 - i]]
         else:
-            return True
+            return terminalTitles
 
+        terminalTitles = []
         for i in range(0, n):
             if arr[n - 1 - i][i][n - 1 - i].state != state:
                 break
+            terminalTitles += [[n - 1 - i, i, n - 1 - i]]
         else:
-            return True
+            return terminalTitles
 
-    return False
+    return None
