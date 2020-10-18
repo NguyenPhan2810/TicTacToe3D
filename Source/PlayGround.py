@@ -176,6 +176,8 @@ class PlayGround(GameObject):
             return None
 
 # titleArray must be 1d array unwrapped from 3d titles
+# Return None if terminal condition meet
+
 def terminalCheck(title3dArray, newestMoveIndex) -> bool:
     arr = title3dArray
     p = newestMoveIndex[0]

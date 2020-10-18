@@ -23,7 +23,7 @@ class Game:
         self.isGameRunning = True
         self.state = GameState(0)
         self.objectRoot = GameObject()
-        self.players = [MinMaxController(maxDepthSearch=1), MinMaxController(maxDepthSearch=2)]
+        self.players = [HumanController(), MinMaxController(maxDepthSearch=2)]
         self.playGround = PlayGround()
         self.playGround.setParent(self.objectRoot)
         for player in self.players:
@@ -95,27 +95,9 @@ class Game:
             if rotation != 0:
                 glRotatef(abs(rotation), 0, rotation, 0)
 
-        playerIndex = 0 if self.state == self.state.player1 else 1
-        activeTitle = self.players[playerIndex].activeTitle(self.playGround.title3dArray, self.state)
-        if activeTitle is not None:
-            self.playGround.setActiveTitle(activeTitle[0], activeTitle[1], activeTitle[2])
-        else:
-            self.playGround.setActiveTitle()
-        if self.players[playerIndex].selectTitle() and activeTitle is not None:
-            titleSelected = activeTitle
-            titleState = None
-            if self.state == GameState.player1: titleState = Title.State.player1
-            elif self.state == GameState.player2: titleState = Title.State.player2
-            self.playGround.activePlane = titleSelected[0]
-            self.playGround.activeRow = titleSelected[1]
-            self.playGround.activeCol = titleSelected[2]
-            checkState = self.playGround.selectTitle(titleState)
-            if checkState == True:
-                if titleState == Title.State.player1: self.state = self.state.player2
-                elif titleState == Title.State.player2: self.state = self.state.player1
-            elif type(checkState) is not bool:
-                print(checkState)
-                return False
+        if self.state != GameState.gameOver:
+            self.controller()
+
         return True
 
     def lateUpdate(self, deltaTime: float):
@@ -131,3 +113,30 @@ class Game:
 
         # Display
         pygame.display.flip()
+
+    def controller(self):
+        playerIndex = 0 if self.state == self.state.player1 else 1
+        activeTitle = self.players[playerIndex].activeTitle(self.playGround.title3dArray, self.state)
+        if activeTitle is not None:
+            self.playGround.setActiveTitle(activeTitle[0], activeTitle[1], activeTitle[2])
+        else:
+            self.playGround.setActiveTitle()
+        if self.players[playerIndex].selectTitle() and activeTitle is not None:
+            titleSelected = activeTitle
+            titleState = None
+            if self.state == GameState.player1:
+                titleState = Title.State.player1
+            elif self.state == GameState.player2:
+                titleState = Title.State.player2
+            self.playGround.activePlane = titleSelected[0]
+            self.playGround.activeRow = titleSelected[1]
+            self.playGround.activeCol = titleSelected[2]
+            checkState = self.playGround.selectTitle(titleState)
+            if checkState == True:
+                if titleState == Title.State.player1:
+                    self.state = self.state.player2
+                elif titleState == Title.State.player2:
+                    self.state = self.state.player1
+            elif type(checkState) is not bool:
+                self.state = GameState.gameOver
+                print(checkState)

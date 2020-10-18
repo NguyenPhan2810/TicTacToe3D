@@ -1,8 +1,8 @@
-titlesColor = (
-    (120, 210, 189), (121, 210, 189), (122, 210, 189), (123, 210, 189), (124, 210, 189), (125, 210, 189), (126, 210, 189), (127, 210, 189), (128, 210, 189),
-    (124, 79, 101), (124, 79, 102), (124, 79, 103), (124, 79, 104), (124, 79, 105), (124, 79, 106), (124, 79, 107), (124, 79, 108), (124, 79, 109),
-    (180, 219, 89), (181, 219, 89), (182, 219, 89), (183, 219, 89), (184, 219, 89), (185, 219, 89), (186, 219, 89), (187, 219, 89), (188, 219, 89),
-)
+titlesColor = [[124,128, 231]] * 9 + [[190,128, 231]] * 9 + [[128,128, 180]] * 9
+
+for i in range(0, len(titlesColor)):
+    titlesColor[i] = [titlesColor[i][0], titlesColor[i][1] + i, titlesColor[i][2]]
+    i += 1
 
 backgroundColor = (51, 51, 51)
 activeTitleColor = (5, 2, 3)
@@ -18,7 +18,7 @@ playGroundScale = 0.3
 heuristicMaxWeigh = 1.1
 heuristicMinWeigh = 1
 
-displaySize = (800, 800)
+displaySize = (1000, 1000)
 displayAspectRatio = displaySize[0] / displaySize[1]
 FOV = 30
 nearClippingPlane = 0.1
