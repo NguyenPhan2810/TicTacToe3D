@@ -166,13 +166,24 @@ class MinMaxController(Controller):
             return True
         return False
 
+    def duplicateTitleArray(self, title3dArray):
+        newArray = []
+
+        for i in range(0, cfg.nTitles):
+            row = []
+            for j in range(0, cfg.nTitles):
+                col = []
+                for k in range(0, cfg.nTitles):
+                    col += [copy.copy(title3dArray[i][j][k])]
+                row += [col]
+            newArray += [row]
+
+        return  newArray
+
     def findBestMove(self, title3dArray, gameState):
         if self.bestMove is not None:
             return
-
-        bestEvaluation = -math.inf
-        n = cfg.nTitles
-
+        print("Finding")
         playerTitleState = oponentTitleState = Title.State.default
         if gameState == gameState.player1:
             playerTitleState = Title.State.player1
@@ -181,28 +192,47 @@ class MinMaxController(Controller):
             playerTitleState = Title.State.player2
             oponentTitleState = Title.State.player1
 
+        self.bestEvaluation = -math.inf
+        self.bestMoves = []
+        self.bestMovesLock = threading.Lock()
+        evaluationThreads = []
+
         # Traverse through all possible move
-        bestMoves = []
         for p, r, c in self.availableTitle:
-            title = title3dArray[p][r][c]
-            preserveState = copy.copy(title.state)
-            title.state = playerTitleState
-            moveEvaluation = MinMax(title3dArray, (p, r, c),
-                                    minTitleState=oponentTitleState,
-                                    maxTitleState=playerTitleState,
-                                    isMax=False,
-                                    maxDepth=self.maxDepth,
-                                    depthWeigh=self.depthWeigh,
-                                    heuristicWeigh=self.heuristicWeigh)
-            title.state = preserveState
+            def evaluateTitle():
+                duplicatedArray = self.duplicateTitleArray(title3dArray)
+                title = duplicatedArray[p][r][c]
+                preserveState = copy.copy(title.state)
+                title.state = playerTitleState
+                moveEvaluation = MinMax(duplicatedArray, (p, r, c),
+                                        minTitleState=oponentTitleState,
+                                        maxTitleState=playerTitleState,
+                                        isMax=False,
+                                        maxDepth=self.maxDepth,
+                                        depthWeigh=self.depthWeigh,
+                                        heuristicWeigh=self.heuristicWeigh)
+                title.state = preserveState
 
-            if moveEvaluation > bestEvaluation:
-                bestEvaluation = moveEvaluation
-                bestMoves = [[p, r, c]]
-            elif moveEvaluation == bestEvaluation:
-                bestMoves += [[p, r, c]]
+                self.bestMovesLock.acquire()
+                if moveEvaluation > self.bestEvaluation:
+                    self.bestEvaluation = moveEvaluation
+                    self.bestMoves = [[p, r, c]]
+                elif moveEvaluation == self.bestEvaluation:
+                    self.bestMoves += [[p, r, c]]
+                self.bestMovesLock.release()
 
-        self.bestMove = rd.choice(bestMoves)
+            if cfg.isMultithreading:
+                newThread = threading.Thread(target=evaluateTitle)
+                newThread.start()
+                evaluationThreads += [newThread]
+            else:
+                evaluateTitle()
+
+        if cfg.isMultithreading:
+            for thread in evaluationThreads:
+                thread.join()
+        print("Done")
+        self.bestMove = rd.choice(self.bestMoves)
 
     def prepareAvailableMove(self, title3dArray):
         self.availableTitle = []
