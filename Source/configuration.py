@@ -40,6 +40,5 @@ minmaxEvaluationScore = 10000
 
 # MinMaxController
 timeProportionRandomMove = 0.7
-waitingTime = 2
+waitingTime = 0.0
 waitingRandomTimeInterval = 0.5
-isMultithreading = False
