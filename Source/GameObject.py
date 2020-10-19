@@ -1,14 +1,10 @@
 import numpy as np
 from OpenGL.GL import *
-from OpenGL.GLU import *
-import copy
-
 
 class Transform:
     def __init__(self):
         self.position = np.array([0.0, 0.0, 0.0])
         self.globalPosition = np.array([0.0, 0.0, 0.0])
-        #self.rotation = np.array([0.0, 0.0, 0.0])
         self.scale = 1.0
         self.globalScale = 1.0
 
@@ -20,7 +16,7 @@ class GLObjectData:
         self.surfaces = np.array(surfaces)
         self.verticesColor = verticesColor
 
-    def render(self, transform: Transform):
+    def draw(self, transform: Transform):
         if self.verticesColor is None:
             return
 
@@ -69,11 +65,11 @@ class GameObject:
         for i in range(0, len(self.children)):
             self.children[i].lateUpdate(deltaTime)
 
-    def render(self):
+    def draw(self):
         if self.meshData is not None:
-            self.meshData.render(self.transform)
+            self.meshData.draw(self.transform)
         for i in range(0, len(self.children)):
-            self.children[i].render()
+            self.children[i].draw()
 
     def move(self, direction):
         self.transform.position += np.array(direction)

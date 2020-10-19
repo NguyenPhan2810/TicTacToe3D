@@ -21,7 +21,7 @@ planeSpacingMultiplier = 2.4
 playGroundScale = 0.3
 
 # Display
-displaySize = (1000, 1000)
+displaySize = (800, 800)
 displayAspectRatio = displaySize[0] / displaySize[1]
 FOV = 30
 nearClippingPlane = 0.1
@@ -40,5 +40,5 @@ minmaxEvaluationScore = 10000
 
 # MinMaxController
 timeProportionRandomMove = 0.7
-waitingTime = 0.0
+waitingTime = 2.0
 waitingRandomTimeInterval = 0.5

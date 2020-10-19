@@ -138,7 +138,9 @@ class MinMaxController(Controller):
             self.prepareAvailableMove(title3dArray)
 
         if self.findBestMoveThread is None:
-            self.findBestMoveThread = threading.Thread(target=self.findBestMove, args=(title3dArray, gameState))
+            self.findBestMoveThread = threading.Thread(target=self.findBestMove,
+                                                       args=(title3dArray, gameState),
+                                                       daemon=True)
             self.findBestMoveThread.start()
         elif not self.findBestMoveThread.is_alive():
             self.findBestMoveThread = None
