@@ -2,7 +2,9 @@ from GameState import *
 from PlayGround import *
 import pygame
 from OpenGL.GL import *
+from OpenGL.GLU import *
 import configuration as cfg
+from pygame.locals import *
 import enum
 
 
@@ -13,8 +15,9 @@ class GameStatus(enum.Enum):
 
 class PlayState(BaseState):
     def __init__(self, player1Controller, player2Controller):
-        self.isGameOver = False
+        self.exit = False
         self.state = GameStatus(0)
+        self.pushState = None
         self.objectRoot = GameObject()
         self.players = [player1Controller, player2Controller]
         self.playGround = PlayGround()
@@ -26,8 +29,12 @@ class PlayState(BaseState):
         self.previousMousePosition = np.array([0, 0, 0])
         self.mouseHold = False
 
+
     def constructor(self):
         BaseState.constructor(self)
+
+        pygame.display.set_mode(cfg.displaySize, DOUBLEBUF | OPENGL)
+        gluPerspective(cfg.FOV, cfg.displayAspectRatio, cfg.nearClippingPlane, cfg.farClippingPlane)
 
         glTranslatef(0, 0, cfg.cameraZOffset)
         glRotatef(cfg.cameraXRotate, 1, 0, 0)
@@ -37,6 +44,13 @@ class PlayState(BaseState):
 
     def reset(self):
         self.objectRoot.reset()
+        self.state = GameStatus.player1
+        self.state = GameStatus(0)
+
+        self.previousMousePosition = np.array([0, 0, 0])
+        self.mouseHold = False
+        self.pushState = None
+        self.exit = False
 
     def eventHandling(self, events):
         BaseState.eventHandling(self, events)
@@ -44,7 +58,7 @@ class PlayState(BaseState):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.isGameOver = True
+                    self.exit = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.previousMousePosition = pygame.mouse.get_pos()
                 self.mouseHold = True
@@ -55,8 +69,16 @@ class PlayState(BaseState):
 
         return False
 
+    def requestPopState(self):
+        return self.isGameOver()
+
+    def requestPushState(self):
+        return self.pushState
+
     def update(self, deltaTime: float) -> bool:
-        if self.isGameOver:
+        if self.exit:
+            from MenuState import MenuState
+            self.pushState = MenuState()
             return False
 
         BaseState.update(self, deltaTime)
@@ -70,7 +92,7 @@ class PlayState(BaseState):
             if rotation != 0:
                 glRotatef(abs(rotation), 0, rotation, 0)
 
-        if self.state != GameStatus.gameOver:
+        if not self.isGameOver():
             self.controller()
 
         return True
@@ -80,13 +102,23 @@ class PlayState(BaseState):
 
         self.objectRoot.lateUpdate(deltaTime)
 
-    def draw(self):
-        BaseState.draw(self)
+    def render(self):
+        # Clear screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glClearColor(cfg.backgroundColor[0] / 255, cfg.backgroundColor[1] / 255, cfg.backgroundColor[2] / 255, 1)
+
+        BaseState.render(self)
 
         # Draw to buffer
         self.objectRoot.draw()
 
+        # Display
+        pygame.display.flip()
+
         return False
+
+    def isGameOver(self):
+        return self.state == GameStatus.gameOver
 
     def controller(self):
         playerIndex = 0 if self.state == self.state.player1 else 1

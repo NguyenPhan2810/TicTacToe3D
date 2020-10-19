@@ -1,13 +1,23 @@
 class BaseState:
     def constructor(self):
+        print("State constructed")
         pass
 
     def destructor(self):
+        print("State destructed")
         pass
 
     # Return False means no event will pass to the lower state
     def eventHandling(self, events) -> bool:
         return True
+
+    # Return True means to pop the state
+    def requestPopState(self):
+        return False
+
+    # Return None to do nothing or an inheritance of BaseState to push
+    def requestPushState(self):
+        return None
 
     # Return False means to end the state
     def update(self, deltaTime: float) -> bool:
@@ -17,5 +27,5 @@ class BaseState:
         pass
 
     # Return False means not to render the lower state
-    def draw(self) -> bool:
+    def render(self) -> bool:
         return True

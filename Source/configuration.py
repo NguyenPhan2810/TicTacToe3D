@@ -45,3 +45,8 @@ minmaxEvaluationScore = 10000
 timeProportionRandomMove = 0.7
 waitingTime = 2.0
 waitingRandomTimeInterval = 0.5
+
+# Main menu
+mainmenuTextColor = (255, 255, 255)
+mainmenuTextColorHovered = (235, 124, 165)
+mainmenuTextColorClicked = (255, 144, 205)

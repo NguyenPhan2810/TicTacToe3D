@@ -152,7 +152,6 @@ class PlayGround(GameObject):
             self.activeTitleIndex = [plane, row, col]
             self.activeTitlePreservedPosition = copy.deepcopy(newTitle.transform.position)
 
-
     # Return True if selection succeeded false if doesn't
     # Return End game result if there is end game
     def selectTitle(self, state: Title.State):
