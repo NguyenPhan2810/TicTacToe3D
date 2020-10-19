@@ -56,12 +56,12 @@ class PlayGround(GameObject):
         self.totalTime = 0.0
 
         self.planes = []
+        self.transform.scale = cfg.playGroundScale
         for y in range(-1, 2):
             i = y + 1
             vertx = GLShapes.Square.verticies()
             newPlane = Plane()
             newPlane.move((0, y * cfg.planeSpacingMultiplier, 0))
-            newPlane.transform.scale = cfg.playGroundScale
             newPlane.setParent(self)
             self.planes += [newPlane]
 
@@ -90,7 +90,6 @@ class PlayGround(GameObject):
                 for k in range(0, cfg.nTitles):
                     self.title3dArray[i][j][k].state = Title.State.default
 
-
     def resetColor(self):
         index = 0
         for i in range(0, cfg.nTitles):
@@ -113,6 +112,7 @@ class PlayGround(GameObject):
             newZ = self.activeTitlePreservedPosition[2] + dz
             title.transform.position[0] = newX
             title.transform.position[2] = newZ
+            title.transform.scale = 1.1
 
         if self.terminalTitles is not None:
             for index in self.terminalTitles:
@@ -138,6 +138,7 @@ class PlayGround(GameObject):
         if index is not None:
             oldTitle = self.title3dArray[index[0]][index[1]][index[2]]
             oldTitle.transform.position = self.activeTitlePreservedPosition
+            oldTitle.transform.scale = 1.0
             self.activeTitlePreservedPosition = None
             self.activeTitleIndex = None
 

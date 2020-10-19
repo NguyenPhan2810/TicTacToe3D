@@ -1,3 +1,5 @@
+import pygame
+
 # Colors
 titlesColor = [[124,128, 231]] * 9 + [[190,128, 231]] * 9 + [[128,128, 180]] * 9
 
@@ -15,10 +17,11 @@ nTitles = 3
 titleWiggleAmount = 0.05
 titleWiggleFrequency = 20
 terminalTitleColorChangeFreq = 5
-terminalTitleColorChangeAmount = 40
+terminalTitleColorChangeAmount = 80
 titlePositionOffset = -0.4
-planeSpacingMultiplier = 2.4
-playGroundScale = 0.3
+planeSpacingMultiplier = 1.6
+playGroundScale = 0.33
+mouseRotationSensitivity = 0.3
 
 # Display
 displaySize = (800, 800)

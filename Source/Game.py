@@ -3,8 +3,10 @@ from PlayGround import *
 import pygame
 from pygame.locals import *
 import configuration as cfg
-import GameState
+import PlayState
+import MenuState
 from OpenGL.GLU import *
+from Controller import HumanController, MinMaxController
 
 class Game:
     def __init__(self):
@@ -13,20 +15,18 @@ class Game:
         gluPerspective(cfg.FOV, cfg.displayAspectRatio, cfg.nearClippingPlane, cfg.farClippingPlane)
 
         self.isGameRunning = True
-        self.isGamePlaying = False
 
-        self.statesStack = [GameState.PlayState()]
+        self.statesStack = [MenuState.MenuState()]
+        #self.statesStack += [PlayState.PlayState(MinMaxController(), MinMaxController())]
 
 
     def play(self):
         for state in self.statesStack:
             state.constructor()
 
-        while self.isGameRunning:
-            prevTime = pygame.time.get_ticks()
+        prevTime = pygame.time.get_ticks()
 
-            self.isGamePlaying = True
-            while self.isGameRunning and self.isGamePlaying:
+        while self.isGameRunning:
                 # Time
                 currentTime = pygame.time.get_ticks()
                 dt = (currentTime - prevTime) / 1000
@@ -63,6 +63,9 @@ class Game:
                 stackSize -= 1
                 continue
             self.statesStack[i].lateUpdate(deltaTime)
+
+        if len(self.statesStack) == 0:
+            self.isGameRunning = False
 
     def render(self):
         # Clear screen

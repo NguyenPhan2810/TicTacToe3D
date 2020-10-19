@@ -56,7 +56,7 @@ class GameObject:
     def update(self, deltaTime: float):
         if self.parent is not None:
             self.transform.globalScale = self.parent.transform.globalScale * self.transform.scale
-            self.transform.globalPosition = (self.parent.transform.globalPosition + self.transform.position) * self.transform.globalScale
+            self.transform.globalPosition = (self.parent.transform.globalPosition + self.transform.position * self.parent.transform.globalScale)
 
         for i in range(0, len(self.children)):
             self.children[i].update(deltaTime)
