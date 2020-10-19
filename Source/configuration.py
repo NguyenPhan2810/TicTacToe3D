@@ -43,7 +43,7 @@ minmaxEvaluationScore = 10000
 
 # MinMaxController
 timeProportionRandomMove = 0.7
-waitingTime = 1.0
+waitingTime = 1.8
 waitingRandomTimeInterval = 0.5
 
 # Main menu
