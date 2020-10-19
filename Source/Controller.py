@@ -11,6 +11,9 @@ class Controller(GameObject):
     def __init__(self):
         GameObject.__init__(self)
 
+    def reset(self):
+        GameObject.reset(self)
+
     # Decide to the active title
     def selectTitle(self) -> bool:
         return False
@@ -29,7 +32,10 @@ class HumanController(Controller):
         self.pickingTitle = None
 
     def reset(self):
-        GameObject.reset(self)
+        Controller.reset(self)
+        self.isSelectTitle = False
+        self.isMouseMoved = False
+        self.isMouseUp = False
         self.pickingTitle = None
 
     def event(self, pygameEvents):
@@ -110,6 +116,22 @@ class MinMaxController(Controller):
 
         self.bestMove = None
         self.currentRandomMove = None
+
+    def reset(self):
+        Controller.reset(self)
+
+        self.isStartCalculating = False
+        self.findBestMoveThread = None
+        self.availableTitle = None
+
+        self.isSelectTitle = False
+        self.timeTaken = 0.0
+        self.isCalculating = False
+        self.randomTimeWait = 0
+
+        self.bestMove = None
+        self.currentRandomMove = None
+
 
     def activeTitle(self, title3dArray, gameState):
         if self.availableTitle is None:

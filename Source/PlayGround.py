@@ -82,13 +82,14 @@ class PlayGround(GameObject):
         GameObject.reset(self)
 
         self.totalTime = 0.0
+        self.terminalTitles = None
+        self.resetColor()
 
         for i in range(0, cfg.nTitles):
             for j in range(0, cfg.nTitles):
                 for k in range(0, cfg.nTitles):
                     self.title3dArray[i][j][k].state = Title.State.default
 
-        self.resetColor()
 
     def resetColor(self):
         index = 0

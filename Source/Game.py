@@ -16,6 +16,7 @@ class GameState(enum.Enum):
 
 class Game:
     def __init__(self):
+        self.isGamePlaying = False
         pygame.init()
         pygame.display.set_mode(cfg.displaySize, DOUBLEBUF | OPENGL)
         gluPerspective(cfg.FOV, cfg.displayAspectRatio, cfg.nearClippingPlane, cfg.farClippingPlane)
@@ -41,11 +42,12 @@ class Game:
 
     def play(self):
         while self.isGameRunning:
+            self.objectRoot.reset()
             self.state = GameState.player1
             prevTime = pygame.time.get_ticks()
 
-            isGamePlaying = True
-            while self.isGameRunning and isGamePlaying:
+            self.isGamePlaying = True
+            while self.isGameRunning and self.isGamePlaying:
                 # Time
                 currentTime = pygame.time.get_ticks()
                 dt = (currentTime - prevTime) / 1000
@@ -57,14 +59,11 @@ class Game:
                 # Events
                 self.eventHandling()
                 # Update
-                isGamePlaying = self.update(dt)
+                if not self.update(dt):
+                    self.isGamePlaying = False
                 self.lateUpdate(dt)
                 # Render
                 self.render()
-
-            if self.isGameRunning:
-                pygame.time.wait(5000)
-                self.objectRoot.reset()
 
     def reset(self):
         self.objectRoot.reset()
@@ -75,7 +74,8 @@ class Game:
             if event.type == pygame.QUIT:
                 self.isGameRunning = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: self.isGameRunning = False
+                if event.key == pygame.K_ESCAPE:
+                    self.isGamePlaying = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.previousMousePosition = pygame.mouse.get_pos()
                 self.mouseHold = True
