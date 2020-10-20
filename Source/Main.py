@@ -4,7 +4,8 @@ def main():
     ttt3d = Game.Game()
     ttt3d.play()
 
-main()
+if __name__ == '__main__':
+    main()
 
 
 

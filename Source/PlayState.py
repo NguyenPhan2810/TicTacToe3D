@@ -57,8 +57,7 @@ class PlayState(BaseState):
 
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if self.isGameOver():
-                    self.reset()
+                self.reset()
                 if event.key == pygame.K_ESCAPE:
                     self.exit = True
             elif event.type == pygame.MOUSEBUTTONDOWN:

@@ -42,8 +42,8 @@ depthWeight = 10
 minmaxEvaluationScore = 10000
 
 # MinMaxController
-timeProportionRandomMove = 0.7
-waitingTime = 1.8
+timeProportionRandomMove = 0.5
+waitingTime = 2.0
 waitingRandomTimeInterval = 0.5
 
 # Main menu
