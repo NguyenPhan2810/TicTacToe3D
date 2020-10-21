@@ -202,7 +202,7 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     title.state = preserveState
 
                     # Alpha beta pruning
-                    if beta <= alpha:
+                    if beta <= alpha and cfg.alphabetaPrunning:
                         break
         score += best
     else:
@@ -228,7 +228,7 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     title.state = preserveState
 
                     # Alpha beta pruning
-                    if beta <= alpha:
+                    if beta <= alpha and cfg.alphabetaPrunning:
                         break
         score += best
     return score if movecount > 0 else 0
