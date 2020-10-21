@@ -5,6 +5,7 @@ import configuration as cfg
 from pygame import time
 import math
 import copy
+import numpy as np
 
 class Title(GameObject):
     class State(enum.Enum):
@@ -28,7 +29,7 @@ class Plane(GameObject):
         GameObject.__init__(self)
         self.titles = []
 
-        loopRange = range(int(-cfg.nTitles / 2), int(cfg.nTitles / 2 + 1))
+        loopRange = np.arange(-cfg.nTitles / 2 + 0.5, cfg.nTitles / 2 + 0.5)
 
         for x in loopRange:
             row = []
@@ -57,7 +58,9 @@ class PlayGround(GameObject):
 
         self.planes = []
         self.transform.scale = cfg.playGroundScale
-        for y in range(-1, 2):
+
+        n = cfg.nTitles
+        for y in np.arange(- n / 2 + 0.5, n / 2 + 0.5):
             i = y + 1
             vertx = GLShapes.Square.verticies()
             newPlane = Plane()
@@ -70,7 +73,7 @@ class PlayGround(GameObject):
         self.activeTitlePreservedPosition = None
 
         self.title3dArray = []
-        for i in range(0, cfg.nTitles):
+        for i in range(0, n):
             self.title3dArray += [self.planes[i].titles]
 
         # Setup color

@@ -1,7 +1,22 @@
 import pygame
 
+# Playground
+nTitles = 3
+titleWiggleAmount = 0.05
+titleWiggleFrequency = 20
+terminalTitleColorChangeFreq = 5
+terminalTitleColorChangeAmount = 80
+titlePositionOffset = -0.4
+planeSpacingMultiplier = nTitles / 2
+playGroundScale = 0.1
+mouseRotationSensitivity = 0.3
+
 # Colors
-titlesColor = [[124,128, 231]] * 9 + [[190,128, 231]] * 9 + [[128,128, 180]] * 9
+titlesColor = [[124,128, 231]] * nTitles* nTitles\
+              + [[190,128, 231]] * nTitles* nTitles\
+              + [[128,128, 180]] * nTitles * nTitles\
+              + [[121,113, 199]] * nTitles* nTitles\
+              + [[79, 189, 219]] * nTitles* nTitles
 
 for i in range(0, len(titlesColor)):
     titlesColor[i] = [titlesColor[i][0], titlesColor[i][1] + i, titlesColor[i][2]]
@@ -11,17 +26,6 @@ backgroundColor = (51, 51, 51)
 activeTitleColor = (5, 2, 3)
 player1Color = (0, 0, 0)
 player2Color = (255, 255, 255)
-
-# Playground
-nTitles = 3
-titleWiggleAmount = 0.05
-titleWiggleFrequency = 20
-terminalTitleColorChangeFreq = 5
-terminalTitleColorChangeAmount = 80
-titlePositionOffset = -0.4
-planeSpacingMultiplier = 1.6
-playGroundScale = 0.33
-mouseRotationSensitivity = 0.3
 
 # Display
 displaySize = (800, 800)
@@ -34,7 +38,7 @@ cameraXRotate = 22
 timePerFrame = 1 / 120
 
 # Min-Max alg
-heuristicMaxWeigh = 1.1
+heuristicMaxWeigh = 1.2
 heuristicMinWeigh = 1
 heuristicWeigh = 2
 maxDepthSearch  = 2
@@ -44,7 +48,7 @@ alphabetaPrunning = True
 
 # MinMaxController
 timeProportionRandomMove = 0.5
-waitingTime = 2.0
+waitingTime = 0
 waitingRandomTimeInterval = 0.5
 
 # Main menu

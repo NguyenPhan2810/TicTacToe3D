@@ -16,17 +16,6 @@ class GLObjectData:
         self.surfaces = np.array(surfaces)
         self.verticesColor = verticesColor
 
-    def draw(self, transform: Transform):
-        if self.verticesColor is None:
-            return
-
-        glBegin(GL_QUADS)
-        for surface in self.surfaces:
-            for vertex in surface:
-                glColor3fv(np.array(self.verticesColor) / 255)
-                glVertex3fv((self.vertices[vertex] * transform.globalScale) + transform.globalPosition)
-        glEnd()
-
 
 # GameObject is a fixed in position object in a scene
 # update method is to update logic, state of an object
@@ -67,9 +56,17 @@ class GameObject:
 
     def draw(self):
         if self.meshData is not None:
-            self.meshData.draw(self.transform)
+            self.glDraw()
         for i in range(0, len(self.children)):
             self.children[i].draw()
+
+    def glDraw(self):
+        glBegin(GL_QUADS)
+        for surface in self.meshData.surfaces:
+            for vertex in surface:
+                glColor3fv(np.array(self.meshData.verticesColor) / 255)
+                glVertex3fv((self.meshData.vertices[vertex] * self.transform.globalScale) + self.transform.globalPosition)
+        glEnd()
 
     def move(self, direction):
         self.transform.position += np.array(direction)
