@@ -83,6 +83,7 @@ class HumanController(Controller):
                     color = cfg.titlesColor[colorIndex]
                     if pixelColor[0] == color[0] and pixelColor[1] == color[1] and pixelColor[2] == color[2]:
                         self.pickingTitle = [i, j, k]
+                        print(i, j, k)
                         break
                     colorIndex += 1
                 else: continue

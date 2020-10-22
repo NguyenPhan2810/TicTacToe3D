@@ -1,16 +1,16 @@
 import pygame
 
 # Playground
-nTitles = 4
-titleWiggleAmount = 0.01
+nTitles = 3
+titleWiggleAmount = 0.02
 titleWiggleFrequency = 20
-titleScaleAmount = 0.06
+titleScaleAmount = 0.02
 titleScaleFrequency = 5
 terminalTitleColorChangeFreq = 5
 terminalTitleColorChangeAmount = 150
-playGroundScale = [1, 1, 1]
+playGroundScale = [0.8, 1, 0.8]
 mouseRotationSensitivity = 0.3
-titlesPadding = -0.3
+titlesPadding = 1
 
 # Colors
 titlesColor = [[124,128, 231]] * nTitles* nTitles\
@@ -19,9 +19,12 @@ titlesColor = [[124,128, 231]] * nTitles* nTitles\
               + [[121,113, 199]] * nTitles* nTitles\
               + [[234, 136, 219]] * nTitles* nTitles
 
+j = 0
 for i in range(0, len(titlesColor)):
-    titlesColor[i] = [titlesColor[i][0], titlesColor[i][1] + i, titlesColor[i][2]]
-    i += 1
+    titlesColor[i] = [titlesColor[i][0], titlesColor[i][1] + j, titlesColor[i][2]]
+    j += 1
+    if j == nTitles * nTitles:
+        j = 0
 
 backgroundColor = (51, 51, 51)
 activeTitleColor = (5, 2, 3)
@@ -39,8 +42,8 @@ cameraXRotate = 22
 timePerFrame = 1 / 120
 
 # Min-Max alg
-heuristicMaxWeigh = 1.2
-heuristicMinWeigh = 1
+heuristicMaxWeigh = 1
+heuristicMinWeigh = 1.2
 heuristicWeigh = 2
 maxDepthSearch  = 2
 depthWeight = 10

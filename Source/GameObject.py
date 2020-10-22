@@ -102,8 +102,8 @@ class GameObject:
         vertices = self.glCalculateTransform(self.meshData.vertices)
         glBegin(GL_QUADS)
         for surface in self.meshData.surfaces:
+            glColor3fv(np.array(self.meshData.verticesColor) / 255)
             for vertex in surface:
-                glColor3fv(np.array(self.meshData.verticesColor) / 255)
                 glVertex3fv(vertices[vertex])
         glEnd()
 

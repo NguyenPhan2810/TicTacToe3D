@@ -47,3 +47,6 @@ class Cube(GLShape):
         (2, 3, 7, 6),
         (3, 0, 4, 7)
     ])
+
+    def __init__(self):
+        self.surfacesColor = []

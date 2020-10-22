@@ -315,9 +315,9 @@ def terminalCheck(title3dArray, newestMoveIndex):
     if r + c == n - 1:
         terminalTitles = []
         for i in range(0, n):
-            if arr[p][i][n - 1 - i].state != state:
+            if arr[i][i][n - 1 - i].state != state:
                 break
-            terminalTitles += [[p, i, n - 1 - i]]
+            terminalTitles += [[i, i, n - 1 - i]]
         else:
             return terminalTitles
 
