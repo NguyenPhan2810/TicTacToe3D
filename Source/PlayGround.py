@@ -30,7 +30,6 @@ class Plane(GameObject):
         self.titles = []
         n = cfg.nTitles
         loopRange = np.arange(-1, 1.01, 2.0 / (n - 1)) # Get the titles center to 0
-        print(loopRange)
         for x in loopRange:
             row = []
             for z in loopRange:
@@ -59,7 +58,6 @@ class PlayGround(GameObject):
         self.transform.scale = cfg.playGroundScale
 
         n = cfg.nTitles
-        print(np.arange(-0.5, 0.51, 1.0 / (n - 1)))
         for y in np.arange(-0.5, 0.51, 1.0 / (n - 1)):  # Make planes center to 0
             i = y + 1
             vertx = GLShapes.Square.verticies()
@@ -103,8 +101,7 @@ class PlayGround(GameObject):
                     index += 1
 
     def lateUpdate(self, deltaTime):
-        GameObject.update(self, deltaTime)
-
+        GameObject.lateUpdate(self, deltaTime)
         self.totalTime += deltaTime
 
         if self.activeTitleIndex is not None:

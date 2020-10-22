@@ -1,13 +1,12 @@
 import numpy as np
+from math import *
 from OpenGL.GL import *
 
 class Transform:
     def __init__(self):
         self.position = np.array([0.0, 0.0, 0.0])
-        self.globalPosition = np.array([0.0, 0.0, 0.0])
         self.scale = 1.0
-        self.globalScale = 1.0
-        self.rotation = np.array([0.0, 0.0, 0.0]) # radian
+        self.rotation = np.array([0.0, 0.0, 0.0]) # degree
 
 
 class GLObjectData:
@@ -27,6 +26,9 @@ class GameObject:
         self.meshData = glObjectData
         self.children = []
         self.parent = None
+
+        self.globalPosition = np.array([0.0, 0.0, 0.0])
+        self.globalScale = 1.0
 
     def setParent(self, parent):
         self.parent = parent
@@ -49,6 +51,9 @@ class GameObject:
         for i in range(0, len(self.children)):
             self.children[i].update(deltaTime)
 
+        if self.parent is None:
+            self.updateRotation()
+
     def lateUpdate(self, deltaTime: float):
         for i in range(0, len(self.children)):
             self.children[i].lateUpdate(deltaTime)
@@ -61,19 +66,56 @@ class GameObject:
 
     def updateTransform(self):
         if self.parent is not None:
-            self.transform.globalScale = self.parent.transform.globalScale * self.transform.scale
-            self.transform.globalPosition = (
-                        self.parent.transform.globalPosition + self.transform.position * self.parent.transform.globalScale)
+            self.globalScale = self.parent.globalScale * self.transform.scale
+            self.globalPosition = (self.parent.globalPosition + self.transform.position * self.parent.globalScale)
+
+    def updateRotation(self):
+        if self.children is None:
+            return
+
+        x, y, z = self.transform.rotation
+        rotMat = rotationMatrix(x, y, z)
+
+        self.updateChildRotation(rotMat)
+
+        for child in self.children:
+            child.updateRotation()
+
+    def updateChildRotation(self, rotationMatrix):
+            for child in self.children:
+                child.globalPosition = np.matmul(rotationMatrix, child.globalPosition)
+                child.updateChildRotation(rotationMatrix)
+
+    def glCalculateTransform(self, vertex):
+
+        vertex = (vertex * self.globalScale) + self.globalPosition
+
+        return vertex
+
 
     def glDraw(self):
         glBegin(GL_QUADS)
         for surface in self.meshData.surfaces:
             for vertex in surface:
                 glColor3fv(np.array(self.meshData.verticesColor) / 255)
-                glVertex3fv((self.meshData.vertices[vertex] * self.transform.globalScale) + self.transform.globalPosition)
+                glVertex3fv(self.glCalculateTransform(self.meshData.vertices[vertex]))
         glEnd()
 
     def move(self, direction):
         self.transform.position += np.array(direction)
         for i in range(0, len(self.children)):
             self.children[i].move(direction)
+
+
+# x, y, z are rotation degree in x, y, z axis respectively
+def rotationMatrix(x, y, z):
+    alpha = radians(x)
+    beta = radians(y)
+    yeta = radians(z)
+
+    yawMat = np.array([[cos(alpha), sin(alpha), 0], [-sin(alpha), cos(alpha), 0], [0, 0, 1]])
+    pitchMat = np.array([[cos(beta), 0, -sin(beta)], [0, 1, 0], [sin(beta), 0, cos(beta)]])
+    rollMat = np.array([[1, 0, 0], [0, cos(yeta), sin(yeta)], [0, -sin(yeta), cos(yeta)]])
+    rotationMat = np.matmul(yawMat, pitchMat, rollMat)
+
+    return rotationMat
