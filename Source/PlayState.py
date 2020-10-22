@@ -84,11 +84,13 @@ class PlayState(BaseState):
 
         if self.mouseHold:
             mousePos = pygame.mouse.get_pos()
-            rotation = (mousePos[0] - self.previousMousePosition[0]) * cfg.mouseRotationSensitivity
+            rotationX = (mousePos[1] - self.previousMousePosition[1]) * cfg.mouseRotationSensitivity
+            rotationY = (mousePos[0] - self.previousMousePosition[0]) * cfg.mouseRotationSensitivity
             self.previousMousePosition = mousePos
 
-            if rotation != 0:
-                glRotatef(abs(rotation), 0, rotation, 0)
+            if rotationX != 0:
+                glRotatef(abs(rotationX), rotationX, 0, 0)
+                self.playGround.transform.rotation[1] += rotationY
 
         if not self.isGameOver():
             self.controller()

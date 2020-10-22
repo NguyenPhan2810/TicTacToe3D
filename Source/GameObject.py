@@ -7,6 +7,7 @@ class Transform:
         self.globalPosition = np.array([0.0, 0.0, 0.0])
         self.scale = 1.0
         self.globalScale = 1.0
+        self.rotation = np.array([0.0, 0.0, 0.0]) # radian
 
 
 class GLObjectData:
@@ -43,9 +44,7 @@ class GameObject:
             self.children[i].event(pygameEvents)
 
     def update(self, deltaTime: float):
-        if self.parent is not None:
-            self.transform.globalScale = self.parent.transform.globalScale * self.transform.scale
-            self.transform.globalPosition = (self.parent.transform.globalPosition + self.transform.position * self.parent.transform.globalScale)
+        self.updateTransform()
 
         for i in range(0, len(self.children)):
             self.children[i].update(deltaTime)
@@ -59,6 +58,12 @@ class GameObject:
             self.glDraw()
         for i in range(0, len(self.children)):
             self.children[i].draw()
+
+    def updateTransform(self):
+        if self.parent is not None:
+            self.transform.globalScale = self.parent.transform.globalScale * self.transform.scale
+            self.transform.globalPosition = (
+                        self.parent.transform.globalPosition + self.transform.position * self.parent.transform.globalScale)
 
     def glDraw(self):
         glBegin(GL_QUADS)

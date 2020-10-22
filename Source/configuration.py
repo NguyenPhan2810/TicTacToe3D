@@ -1,22 +1,24 @@
 import pygame
 
 # Playground
-nTitles = 3
-titleWiggleAmount = 0.05
+nTitles = 4
+titleWiggleAmount = 0.01
 titleWiggleFrequency = 20
+titleScaleAmount = 0.06
+titleScaleFrequency = 5
 terminalTitleColorChangeFreq = 5
-terminalTitleColorChangeAmount = 80
-titlePositionOffset = -0.4
-planeSpacingMultiplier = nTitles / 2
-playGroundScale = 0.1
+terminalTitleColorChangeAmount = 150
+planeSpacingMultiplier = 1.3
+playGroundScale = 0.8
 mouseRotationSensitivity = 0.3
+titlesPadding = -0.3
 
 # Colors
 titlesColor = [[124,128, 231]] * nTitles* nTitles\
               + [[190,128, 231]] * nTitles* nTitles\
               + [[128,128, 180]] * nTitles * nTitles\
               + [[121,113, 199]] * nTitles* nTitles\
-              + [[79, 189, 219]] * nTitles* nTitles
+              + [[234, 136, 219]] * nTitles* nTitles
 
 for i in range(0, len(titlesColor)):
     titlesColor[i] = [titlesColor[i][0], titlesColor[i][1] + i, titlesColor[i][2]]

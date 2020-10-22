@@ -28,17 +28,16 @@ class Plane(GameObject):
     def __init__(self, color=None):
         GameObject.__init__(self)
         self.titles = []
-
-        loopRange = np.arange(-cfg.nTitles / 2 + 0.5, cfg.nTitles / 2 + 0.5)
-
+        n = cfg.nTitles
+        loopRange = np.arange(-1, 1.01, 2.0 / (n - 1)) # Get the titles center to 0
+        print(loopRange)
         for x in loopRange:
             row = []
             for z in loopRange:
                 newTitle = Title(color)
-                newTitle.transform.position[0] = self.transform.position[0] + x * (
-                            cfg.nTitles + cfg.titlePositionOffset)
-                newTitle.transform.position[2] = self.transform.position[2] + z * (
-                            cfg.nTitles + cfg.titlePositionOffset)
+                newTitle.transform.position[0] = self.transform.position[0] + x
+                newTitle.transform.position[2] = self.transform.position[2] + z
+                newTitle.transform.scale = 1 / (n + cfg.titlesPadding)
                 newTitle.setParent(self)
                 row += [newTitle]
             self.titles += [row]
@@ -60,7 +59,8 @@ class PlayGround(GameObject):
         self.transform.scale = cfg.playGroundScale
 
         n = cfg.nTitles
-        for y in np.arange(- n / 2 + 0.5, n / 2 + 0.5):
+        print(np.arange(-0.5, 0.51, 1.0 / (n - 1)))
+        for y in np.arange(-0.5, 0.51, 1.0 / (n - 1)):  # Make planes center to 0
             i = y + 1
             vertx = GLShapes.Square.verticies()
             newPlane = Plane()
@@ -70,7 +70,7 @@ class PlayGround(GameObject):
 
         self.selectionCount = 0
         self.activeTitleIndex = None
-        self.activeTitlePreservedPosition = None
+        self.activeTitlePreservedTransform = None
 
         self.title3dArray = []
         for i in range(0, n):
@@ -109,13 +109,17 @@ class PlayGround(GameObject):
 
         if self.activeTitleIndex is not None:
             title = self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]]
+            oldTransform = self.activeTitlePreservedTransform
+
             dx = cfg.titleWiggleAmount * math.cos(self.totalTime * cfg.titleWiggleFrequency)
             dz = cfg.titleWiggleAmount * math.sin(self.totalTime * cfg.titleWiggleFrequency)
-            newX = self.activeTitlePreservedPosition[0] + dx
-            newZ = self.activeTitlePreservedPosition[2] + dz
+            ds = cfg.titleScaleAmount * math.sin(self.totalTime * cfg.titleScaleFrequency)
+            newX = oldTransform.position[0] + dx
+            newZ = oldTransform.position[2] + dz
+            newS = oldTransform.scale + ds
             title.transform.position[0] = newX
             title.transform.position[2] = newZ
-            title.transform.scale = 1.1
+            title.transform.scale = newS
 
         if self.terminalTitles is not None:
             for index in self.terminalTitles:
@@ -140,9 +144,8 @@ class PlayGround(GameObject):
         # Kind of reset if no coordinates are provided
         if index is not None:
             oldTitle = self.title3dArray[index[0]][index[1]][index[2]]
-            oldTitle.transform.position = self.activeTitlePreservedPosition
-            oldTitle.transform.scale = 1.0
-            self.activeTitlePreservedPosition = None
+            oldTitle.transform = self.activeTitlePreservedTransform
+            self.activeTitlePreservedTransform = None
             self.activeTitleIndex = None
 
         if plane is None or row is None or col is None:
@@ -153,7 +156,7 @@ class PlayGround(GameObject):
         newTitle = self.title3dArray[plane][row][col]
         if newTitle.state == Title.State.default:
             self.activeTitleIndex = [plane, row, col]
-            self.activeTitlePreservedPosition = copy.deepcopy(newTitle.transform.position)
+            self.activeTitlePreservedTransform = copy.deepcopy(newTitle.transform)
 
     # Return True if selection succeeded false if doesn't
     # Return End game result if there is end game
