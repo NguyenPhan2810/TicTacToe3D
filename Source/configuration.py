@@ -8,8 +8,7 @@ titleScaleAmount = 0.06
 titleScaleFrequency = 5
 terminalTitleColorChangeFreq = 5
 terminalTitleColorChangeAmount = 150
-planeSpacingMultiplier = 1.3
-playGroundScale = 0.8
+playGroundScale = [1, 1, 1]
 mouseRotationSensitivity = 0.3
 titlesPadding = -0.3
 

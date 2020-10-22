@@ -14,10 +14,12 @@ class Title(GameObject):
         player2 = 2
 
     def __init__(self, color=None):
-        vertx, edges, faces = GLShapes.Square.data()
-        GameObject.__init__(self, GLObjectData(vertx, edges, faces, color))
+        shape = GLShapes.Cube
+        vertx, edges, faces = shape.verticies, shape.edges, shape.surfaces
+        GameObject.__init__(self, GLMeshData(vertx, edges, faces, color))
         self.state = Title.State(0)
         self.color = color
+        self.transform.scale[1] /= 5
 
     def changeToColor(self, color=None):
         if color is not None:
@@ -36,7 +38,7 @@ class Plane(GameObject):
                 newTitle = Title(color)
                 newTitle.transform.position[0] = self.transform.position[0] + x
                 newTitle.transform.position[2] = self.transform.position[2] + z
-                newTitle.transform.scale = 1 / (n + cfg.titlesPadding)
+                newTitle.transform.scale /= (n + cfg.titlesPadding)
                 newTitle.setParent(self)
                 row += [newTitle]
             self.titles += [row]
@@ -60,9 +62,8 @@ class PlayGround(GameObject):
         n = cfg.nTitles
         for y in np.arange(-0.5, 0.51, 1.0 / (n - 1)):  # Make planes center to 0
             i = y + 1
-            vertx = GLShapes.Square.verticies()
             newPlane = Plane()
-            newPlane.move((0, y * cfg.planeSpacingMultiplier, 0))
+            newPlane.move((0, y, 0))
             newPlane.setParent(self)
             self.planes += [newPlane]
 

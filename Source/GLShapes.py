@@ -1,25 +1,49 @@
 import numpy as np
 
-class Square():
-    def data():
-        return Square.verticies(), Square.edges(), Square.surfaces()
+class GLShape():
+    verticies = []
+    edges = []
+    surfaces = []
 
-    def verticies():
-        vertx =  [
-            [1, 0, 1],
-            [-1, 0, 1],
-            [-1, 0, -1],
-            [1, 0, -1]
-        ]
+class Square(GLShape):
+    verticies = np.array([
+            [1.0, 0.0, 1.0],
+            [-1.0, 0.0, 1.0],
+            [-1.0, 0.0, -1.0],
+            [1.0, 0.0, -1.0]
+        ])
 
-        return vertx
-
-    def edges():
-        return  np.array([
+    edges = np.array([
             (0, 1), (1, 2), (2, 3), (3, 0)
         ])
 
-    def surfaces():
-        return np.array([
-            [0, 1, 2, 3]
+    surfaces = np.array([
+            (0, 1, 2, 3)
         ])
+
+class Cube(GLShape):
+    verticies = np.array([
+            [1, 1, 1],
+            [-1, 1, 1],
+            [-1, 1, -1],
+            [1, 1, -1],
+            [1, -1, 1],
+            [-1, -1, 1],
+            [-1, -1, -1],
+            [1, -1, -1],
+        ])
+
+    edges = np.array([
+        (0, 1), (1, 2), (2, 3), (3, 0),
+        (4, 5), (5, 6), (6, 7), (7, 4),
+        (0, 4), (1, 5), (2, 6), (3, 7)
+    ])
+
+    surfaces = np.array([
+        (0, 1, 2, 3),
+        (4, 5, 6, 7),
+        (0, 1, 5, 4),
+        (1, 2, 6, 5),
+        (2, 3, 7, 6),
+        (3, 0, 4, 7)
+    ])

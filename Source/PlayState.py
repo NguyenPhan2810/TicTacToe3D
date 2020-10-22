@@ -89,7 +89,7 @@ class PlayState(BaseState):
             self.previousMousePosition = mousePos
 
             glRotatef(abs(rotationX), rotationX, 0, 0)
-        self.playGround.transform.rotation[1] += 180 * deltaTime
+            self.playGround.transform.rotation[1] -= rotationY
 
         if not self.isGameOver():
             self.controller()
