@@ -34,6 +34,7 @@ class PlayState(BaseState):
         BaseState.constructor(self)
 
         pygame.display.set_mode(cfg.displaySize, DOUBLEBUF | OPENGL)
+        glEnable(GL_DEPTH_TEST)
         gluPerspective(cfg.FOV, cfg.displayAspectRatio, cfg.nearClippingPlane, cfg.farClippingPlane)
         glFrontFace(GL_CW)
         glTranslatef(0, 0, cfg.cameraZOffset)
