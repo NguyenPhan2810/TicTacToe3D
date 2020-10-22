@@ -1,10 +1,8 @@
 class BaseState:
     def constructor(self):
-        print("State constructed")
         pass
 
     def destructor(self):
-        print("State destructed")
         pass
 
     # Return False means no event will pass to the lower state

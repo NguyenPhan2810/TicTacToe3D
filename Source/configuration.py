@@ -1,7 +1,7 @@
 import pygame
 
 # Playground
-nTitles = 3
+nTitles = 4
 titleWiggleAmount = 0.02
 titleWiggleFrequency = 20
 titleScaleAmount = 0.02
@@ -43,8 +43,8 @@ timePerFrame = 1 / 120
 
 # Min-Max alg
 heuristicMaxWeigh = 1
-heuristicMinWeigh = 1.2
-heuristicWeigh = 2
+heuristicMinWeigh = 2
+heuristicWeigh = 5
 maxDepthSearch  = 2
 depthWeight = 10
 minmaxEvaluationScore = 10000
@@ -52,7 +52,7 @@ alphabetaPrunning = True
 
 # MinMaxController
 timeProportionRandomMove = 0.5
-waitingTime = 0
+waitingTime = 2
 waitingRandomTimeInterval = 0.5
 
 # Main menu

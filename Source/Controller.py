@@ -83,7 +83,6 @@ class HumanController(Controller):
                     color = cfg.titlesColor[colorIndex]
                     if pixelColor[0] == color[0] and pixelColor[1] == color[1] and pixelColor[2] == color[2]:
                         self.pickingTitle = [i, j, k]
-                        print(i, j, k)
                         break
                     colorIndex += 1
                 else: continue
@@ -170,6 +169,7 @@ class MinMaxController(Controller):
         return False
 
     def findBestMove(self, title3dArray, gameState):
+        timeStart = pygame.time.get_ticks()
         if self.bestMove is not None:
             return
 
@@ -206,6 +206,9 @@ class MinMaxController(Controller):
                 bestMoves += [[p, r, c]]
 
         self.bestMove = rd.choice(bestMoves)
+        timeEnd = pygame.time.get_ticks()
+        totalTime = (timeEnd - timeStart) / 1000
+        print("Move calculated in ", totalTime, " seconds")
 
     def prepareAvailableMove(self, title3dArray):
         self.availableTitle = []
