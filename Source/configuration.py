@@ -23,6 +23,7 @@ planeColor = [[rd.randint(100, 255) for rgb in range(0, 3)] for plane in range(0
 
 backgroundColor = (51, 51, 51)
 activeTitleColor = (5, 2, 3)
+inactiveTitleColor = (100, 100, 100)
 player1Color = (255, 100, 100)
 player2Color = (100, 100, 255)
 

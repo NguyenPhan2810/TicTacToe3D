@@ -32,11 +32,13 @@ class Title(GameObject):
         self.state = state
         if state == Title.State.player1:
             self.meshData = self.player1Shape
-        if state == Title.State.player2:
+            #self.transform.rotation[1] = 45
+        elif state == Title.State.player2:
             self.meshData = self.player2Shape
+        else:
+            self.meshData = self.defaultShape
 
         self.setColor(self.color)
-        self.transform.rotation[1] = 45
 
 class Plane(GameObject):
     def __init__(self, color=None):
@@ -196,6 +198,11 @@ class PlayGround(GameObject):
 
         self.terminalTitles = terminalCheck(title3dArray, newestSelection)
         if self.terminalTitles is not None:
+            for planes in title3dArray:
+                for rows in planes:
+                    for title in rows:
+                        if title.state == Title.State.default:
+                            title.setColor(cfg.inactiveTitleColor)
             return title3dArray[plane][row][col].state
         elif self.selectionCount == math.pow(cfg.nTitles, 3):
             return Title.State.default
