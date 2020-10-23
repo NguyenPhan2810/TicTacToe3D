@@ -60,33 +60,33 @@ class XShape(GLShape):
         (5, 6, 18, 17), (6, 7, 19, 18), (7, 8, 20, 19), (8, 9, 21, 20), (9, 10, 22, 21),
         (10, 11, 23, 22), (11, 0, 12, 23)
     ]
-    def __init__(self, surfaceColor = None, lengthProportion = cfg.titleXLengthProportion):
+    def __init__(self, surfaceColor = None, thickness = cfg.titleXThickness):
         vertices = [
-            [lengthProportion, -1, lengthProportion],
-            [lengthProportion, -1, 1],
-            [-lengthProportion, -1, 1],
-            [-lengthProportion, -1, lengthProportion],
-            [-1, -1, lengthProportion],
-            [-1, -1, -lengthProportion],
-            [-lengthProportion, -1, -lengthProportion],
-            [-lengthProportion, -1, -1],
-            [lengthProportion, -1, -1],
-            [lengthProportion, -1, -lengthProportion],
-            [1, -1, -lengthProportion],
-            [1, -1, lengthProportion],
+            [thickness, -1, thickness],
+            [thickness, -1, 1],
+            [-thickness, -1, 1],
+            [-thickness, -1, thickness],
+            [-1, -1, thickness],
+            [-1, -1, -thickness],
+            [-thickness, -1, -thickness],
+            [-thickness, -1, -1],
+            [thickness, -1, -1],
+            [thickness, -1, -thickness],
+            [1, -1, -thickness],
+            [1, -1, thickness],
 
-            [lengthProportion, 1, lengthProportion],
-            [lengthProportion, 1, 1],
-            [-lengthProportion, 1, 1],
-            [-lengthProportion, 1, lengthProportion],
-            [-1, 1, lengthProportion],
-            [-1, 1, -lengthProportion],
-            [-lengthProportion, 1, -lengthProportion],
-            [-lengthProportion, 1, -1],
-            [lengthProportion, 1, -1],
-            [lengthProportion, 1, -lengthProportion],
-            [1, 1, -lengthProportion],
-            [1, 1, lengthProportion]
+            [thickness, 1, thickness],
+            [thickness, 1, 1],
+            [-thickness, 1, 1],
+            [-thickness, 1, thickness],
+            [-1, 1, thickness],
+            [-1, 1, -thickness],
+            [-thickness, 1, -thickness],
+            [-thickness, 1, -1],
+            [thickness, 1, -1],
+            [thickness, 1, -thickness],
+            [1, 1, -thickness],
+            [1, 1, thickness]
         ]
 
         cos45 = math.cos(math.radians(45))

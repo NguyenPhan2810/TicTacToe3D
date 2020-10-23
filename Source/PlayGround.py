@@ -20,7 +20,6 @@ class Title(GameObject):
         self.player2Shape = GLShapes.OShape()
         self.meshData = self.defaultShape
         self.state = Title.State(0)
-        self.transform.scale[1] /= 5
         self.color = color
 
     def setColor(self, color):
@@ -42,20 +41,33 @@ class Title(GameObject):
 class Plane(GameObject):
     def __init__(self, color=None):
         GameObject.__init__(self)
-        self.titles = []
+        self.color = color
+        self.titles = [[Title() for c in range(cfg.nTitles)] for r in range(cfg.nTitles)]
+        for r in range(cfg.nTitles):
+            for c in range(cfg.nTitles):
+                self.titles[r][c].setParent(self)
+        self.setupTitles()
+
+    def reset(self):
+        self.setupTitles()
+
+    def setupTitles(self):
         n = cfg.nTitles
         loopRange = np.arange(-1, 1.01, 2.0 / (n - 1)) # Get the titles center to 0
+        r = 0
         for x in loopRange:
-            row = []
+            c = 0
             for z in loopRange:
-                newTitle = Title(color)
-                newTitle.transform.position[0] = self.transform.position[0] + x
-                newTitle.transform.position[2] = self.transform.position[2] + z
-                newTitle.transform.scale /= (n + cfg.titlesPadding)
-                newTitle.transform.rotation[1] = 45
-                newTitle.setParent(self)
-                row += [newTitle]
-            self.titles += [row]
+                title = self.titles[r][c]
+                title.setColor(self.color)
+                title.transform.position[0] = self.transform.position[0] + x
+                title.transform.position[2] = self.transform.position[2] + z
+                title.transform.scale = np.array([1 / (n + cfg.titlesPadding)] * 3)
+                title.transform.scale[1] /= 5
+
+                title.changeState(Title.State.default)
+                c += 1
+            r += 1
 
     def setColor(self, color):
         for i in range(0, len(self.titles)):
@@ -100,11 +112,6 @@ class PlayGround(GameObject):
         self.totalTime = 0.0
         self.terminalTitles = None
         self.resetColor()
-
-        for i in range(0, cfg.nTitles):
-            for j in range(0, cfg.nTitles):
-                for k in range(0, cfg.nTitles):
-                    self.title3dArray[i][j][k].changeState(Title.State.default)
 
     def resetColor(self):
         for i in range(0, cfg.nTitles):
@@ -181,9 +188,7 @@ class PlayGround(GameObject):
 
             result = self.endgameCheck()
             self.setActiveTitle()
-            print(title.transform.scale)
             title.transform.scale *= cfg.titleSelectedScaleMultiplier
-            print(title.transform.scale)
             if result is not None:
                 return result
             return True

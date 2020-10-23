@@ -1,11 +1,11 @@
 import pygame
 
 # Playground
-nTitles = 3
+nTitles = 3 # must be > 1
 
-titleXLengthProportion = 0.2
-titleOThickness = 0.4
-titleOSegments = 20
+titleXThickness = 0.1
+titleOThickness = 0.3
+titleOSegments = 10
 
 titleWiggleAmount = 0.02
 titleWiggleFrequency = 20
@@ -22,13 +22,13 @@ titlesPadding = 1
 
 # Colors
 import random as rd
-planeColor = [[rd.randint(100, 255) for rgb in range(0, 3)] for plane in range(0, nTitles)]
+planeColor = [[rd.randint(140, 230) for rgb in range(0, 3)] for plane in range(0, nTitles)]
 
 backgroundColor = (51, 51, 51)
 activeTitleColor = (5, 2, 3)
 inactiveTitleColor = (100, 100, 100)
-player1Color = (255, 100, 100)
-player2Color = (100, 100, 255)
+player1Color = (255, 90, 90)
+player2Color = (100, 90, 255)
 
 # Display
 displaySize = (800, 800)
