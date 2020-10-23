@@ -11,8 +11,11 @@ titleWiggleAmount = 0.02
 titleWiggleFrequency = 20
 titleScaleAmount = 0.01
 titleScaleFrequency = 20
+titleSelectedScaleMultiplier = 1.8
+
 terminalTitleColorChangeFreq = 5
 terminalTitleColorChangeAmount = 70
+
 playGroundScale = [1, 1, 1]
 mouseRotationSensitivity = 0.3
 titlesPadding = 1

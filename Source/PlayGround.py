@@ -181,6 +181,9 @@ class PlayGround(GameObject):
 
             result = self.endgameCheck()
             self.setActiveTitle()
+            print(title.transform.scale)
+            title.transform.scale *= cfg.titleSelectedScaleMultiplier
+            print(title.transform.scale)
             if result is not None:
                 return result
             return True
