@@ -99,7 +99,6 @@ class MinMaxController(Controller):
         GameObject.__init__(self)
         self.isStartCalculating = False
         self.findBestMoveProcess = None
-        self.bestMoveSenderPipe, self.bestMoveReceiverPipe = multiprocessing.Pipe(True)
         self.availableTitle = None
 
         self.isSelectTitle = False
@@ -121,9 +120,8 @@ class MinMaxController(Controller):
         Controller.reset(self)
 
         self.isStartCalculating = False
-        if self.findBestMoveProcess is not None:
-            self.findBestMoveProcess.terminate()
         self.findBestMoveProcess = None
+        self.bestMoveQueue = multiprocessing.Queue()
         self.availableTitle = None
 
         self.isSelectTitle = False
@@ -134,11 +132,6 @@ class MinMaxController(Controller):
         self.bestMove = None
         self.currentRandomMove = None
 
-    def constructor(self):
-            self.findBestMoveProcess = multiprocessing.Process(target=self.findBestMove,
-                                                               args=(self.bestMoveSenderPipe, self.bestMoveReceiverPipe))
-            self.findBestMoveProcess.start()
-
     def destructor(self):
         if self.findBestMoveProcess is not None:
             self.findBestMoveProcess.terminate()
@@ -147,13 +140,14 @@ class MinMaxController(Controller):
         if self.availableTitle is None:
             self.prepareAvailableMove(title3dArray)
 
-        if self.bestMove is None:
-            #self.bestMoveParentPipe.send(title3dArray)
-            #self.bestMoveParentPipe.send(gameState)
-            #self.bestMove = self.bestMoveParentPipe.recv()
-            self.bestMoveSenderPipe.send("Hello parent")
-            print(self.bestMoveReceiverPipe.recv())
-
+        if self.findBestMoveProcess is None and self.bestMove is None:
+            self.findBestMoveProcess = multiprocessing.Process(target=self.findBestMove,
+                                                               args=(title3dArray, gameState, self.bestMoveQueue))
+            self.findBestMoveProcess.start()
+        elif not self.findBestMoveProcess.is_alive():
+            self.bestMove = self.bestMoveQueue.get()
+            self.findBestMoveProcess = None
+            
         self.isCalculating = self.bestMove is None
 
         if not self.isStartCalculating and self.isCalculating and not self.isSelectTitle:
@@ -177,56 +171,45 @@ class MinMaxController(Controller):
             return True
         return False
 
-    # Pass in title3dArray and gameState using queue
-    # Then receive best move through queue
-    def findBestMove(self, senderPipe, receiverPipe):
-        while True:
-            print(receiverPipe.recv())
-            senderPipe.send("Child hello")
+    def findBestMove(self, title3dArray, gameState, queue):
+        timeStart = pygame.time.get_ticks()
 
-        while True:
-            title3dArray = pipe.recv()
-            print("received")
-            gameState = pipe.recv()
-            print("Start calculating move")
-            timeStart = pygame.time.get_ticks()
+        bestEvaluation = -math.inf
+        n = cfg.nTitles
 
-            bestEvaluation = -math.inf
-            n = cfg.nTitles
+        playerTitleState = oponentTitleState = Title.State.default
+        if gameState == gameState.player1:
+            playerTitleState = Title.State.player1
+            oponentTitleState = Title.State.player2
+        else:
+            playerTitleState = Title.State.player2
+            oponentTitleState = Title.State.player1
 
-            playerTitleState = oponentTitleState = Title.State.default
-            if gameState == gameState.player1:
-                playerTitleState = Title.State.player1
-                oponentTitleState = Title.State.player2
-            else:
-                playerTitleState = Title.State.player2
-                oponentTitleState = Title.State.player1
+        # Traverse through all possible move
+        bestMoves = []
+        for p, r, c in self.availableTitle:
+            title = title3dArray[p][r][c]
+            preserveState = copy.copy(title.state)
+            title.state = playerTitleState
+            moveEvaluation = MinMax(title3dArray, (p, r, c),
+                                    minTitleState=oponentTitleState,
+                                    maxTitleState=playerTitleState,
+                                    isMax=False,
+                                    maxDepth=self.maxDepth,
+                                    depthWeigh=self.depthWeigh,
+                                    heuristicWeigh=self.heuristicWeigh)
+            title.state = preserveState
 
-            # Traverse through all possible move
-            bestMoves = []
-            for p, r, c in self.availableTitle:
-                title = title3dArray[p][r][c]
-                preserveState = copy.copy(title.state)
-                title.state = playerTitleState
-                moveEvaluation = MinMax(title3dArray, (p, r, c),
-                                        minTitleState=oponentTitleState,
-                                        maxTitleState=playerTitleState,
-                                        isMax=False,
-                                        maxDepth=self.maxDepth,
-                                        depthWeigh=self.depthWeigh,
-                                        heuristicWeigh=self.heuristicWeigh)
-                title.state = preserveState
+            if moveEvaluation > bestEvaluation:
+                bestEvaluation = moveEvaluation
+                bestMoves = [[p, r, c]]
+            elif moveEvaluation == bestEvaluation:
+                bestMoves += [[p, r, c]]
 
-                if moveEvaluation > bestEvaluation:
-                    bestEvaluation = moveEvaluation
-                    bestMoves = [[p, r, c]]
-                elif moveEvaluation == bestEvaluation:
-                    bestMoves += [[p, r, c]]
-
-            pipe.send(rd.choice(bestMoves))
-            timeEnd = pygame.time.get_ticks()
-            totalTime = (timeEnd - timeStart) / 1000
-            print("Move calculated in ", totalTime, " seconds")
+        queue.put(rd.choice(bestMoves))
+        timeEnd = pygame.time.get_ticks()
+        totalTime = (timeEnd - timeStart) / 1000
+        print("Move calculated in ", totalTime, " seconds")
 
     def prepareAvailableMove(self, title3dArray):
         self.availableTitle = []
