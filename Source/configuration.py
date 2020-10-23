@@ -1,7 +1,7 @@
 import pygame
 
 # Playground
-nTitles = 4
+nTitles = 3
 
 titleXLengthProportion = 0.2
 titleOThickness = 0.4
