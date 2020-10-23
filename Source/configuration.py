@@ -1,14 +1,19 @@
 import pygame
 
 # Playground
-nTitles = 3
+nTitles = 4
+
+titleXLengthProportion = 0.2
+titleOThickness = 0.4
+titleOSegments = 20
+
 titleWiggleAmount = 0.02
 titleWiggleFrequency = 20
 titleScaleAmount = 0.01
 titleScaleFrequency = 20
 terminalTitleColorChangeFreq = 5
-terminalTitleColorChangeAmount = 150
-playGroundScale = [0.8, 1.3, 0.8]
+terminalTitleColorChangeAmount = 70
+playGroundScale = [1, 1, 1]
 mouseRotationSensitivity = 0.3
 titlesPadding = 1
 
@@ -19,7 +24,7 @@ planeColor = [[rd.randint(100, 255) for rgb in range(0, 3)] for plane in range(0
 backgroundColor = (51, 51, 51)
 activeTitleColor = (5, 2, 3)
 player1Color = (255, 100, 100)
-player2Color = (255, 255, 255)
+player2Color = (100, 100, 255)
 
 # Display
 displaySize = (800, 800)

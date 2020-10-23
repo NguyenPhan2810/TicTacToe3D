@@ -38,6 +38,14 @@ class GameObject:
         for i in range(0, len(self.children)):
             self.children[i].reset()
 
+    def constructor(self):
+        for i in range(0, len(self.children)):
+            self.children[i].constructor()
+
+    def destructor(self):
+        for i in range(0, len(self.children)):
+            self.children[i].destructor()
+
     def event(self, pygameEvents):
         for i in range(0, len(self.children)):
             self.children[i].event(pygameEvents)
@@ -126,7 +134,7 @@ class GameObject:
         glBegin(GL_QUADS)
         surfaceIndex = 0
         for surface in self.meshData.surfaces:
-            glColor3fv(np.array(self.meshData.colors[surfaceIndex]) / 255)
+            glColor3fv(np.array(self.meshData.surfaceColors[surfaceIndex]) / 255)
             surfaceIndex += 1
             for vertex in surface:
                 glVertex3fv(self.transformedVertices[vertex])

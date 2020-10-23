@@ -31,6 +31,7 @@ class PlayState(BaseState):
 
     def constructor(self):
         BaseState.constructor(self)
+        self.objectRoot.constructor()
 
         pygame.display.set_mode(cfg.displaySize, DOUBLEBUF | OPENGL)
         glEnable(GL_DEPTH_TEST)
@@ -42,6 +43,9 @@ class PlayState(BaseState):
 
         self.objectRoot.reset()
         self.state = GameStatus.player1
+
+    def destructor(self):
+        self.objectRoot.destructor()
 
     def reset(self):
         self.objectRoot.reset()

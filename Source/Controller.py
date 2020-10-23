@@ -131,6 +131,9 @@ class MinMaxController(Controller):
         self.bestMove = None
         self.currentRandomMove = None
 
+    def destructor(self):
+        if self.findBestMoveThread is not None:
+            self.findBestMoveThread.stop()
 
     def activeTitle(self, title3dArray, gameState):
         if self.availableTitle is None:
@@ -138,8 +141,7 @@ class MinMaxController(Controller):
 
         if self.findBestMoveThread is None:
             self.findBestMoveThread = threading.Thread(target=self.findBestMove,
-                                                       args=(title3dArray, gameState),
-                                                       daemon=True)
+                                                       args=(title3dArray, gameState))
             self.findBestMoveThread.start()
         elif not self.findBestMoveThread.is_alive():
             self.findBestMoveThread = None

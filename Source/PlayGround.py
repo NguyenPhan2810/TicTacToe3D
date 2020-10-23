@@ -16,8 +16,8 @@ class Title(GameObject):
     def __init__(self, color=None):
         GameObject.__init__(self)
         self.defaultShape = GLShapes.Cube()
-        self.player1Shape = GLShapes.PlusShape()
-        self.player2Shape = GLShapes.PlusShape()
+        self.player1Shape = GLShapes.XShape()
+        self.player2Shape = GLShapes.OShape()
         self.meshData = self.defaultShape
         self.state = Title.State(0)
         self.transform.scale[1] /= 5
@@ -25,16 +25,18 @@ class Title(GameObject):
 
     def setColor(self, color):
         if color is not None:
-            colorList = [copy.deepcopy(color) for i in range(self.meshData.surfaces.__len__())]
-            self.meshData.colors = colorList
+            self.meshData.setColor(color)
             self.color = color
 
     def changeState(self, state):
         self.state = state
         if state == Title.State.player1:
             self.meshData = self.player1Shape
-            self.setColor(self.color)
-            self.transform.rotation[1] = 45
+        if state == Title.State.player2:
+            self.meshData = self.player2Shape
+
+        self.setColor(self.color)
+        self.transform.rotation[1] = 45
 
 class Plane(GameObject):
     def __init__(self, color=None):
