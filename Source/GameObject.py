@@ -1,6 +1,7 @@
 import numpy as np
 from math import *
 from OpenGL.GL import *
+import GLShapes
 
 class Transform:
     def __init__(self):
@@ -8,24 +9,15 @@ class Transform:
         self.scale = np.array([1.0, 1.0, 1.0])
         self.rotation = np.array([0.0, 0.0, 0.0]) # degree
 
-
-class GLMeshData:
-    def __init__(self, vertices, edges, surfaces, verticesColor=None):
-        self.vertices = np.array(vertices)
-        self.edges = np.array(edges)
-        self.surfaces = np.array(surfaces)
-        self.verticesColor = verticesColor
-
-
 # GameObject is a fixed in position object in a scene
 # update method is to update logic, state of an object
 # render method helps the object to be visible
 class GameObject:
     id = 0
-    def __init__(self, glObjectData: GLMeshData=None):
+    def __init__(self):
         self.transform = Transform()
         self.globalTransform = Transform()
-        self.meshData = glObjectData
+        self.meshData = None
         self.transformedVertices = None
 
         self.children = []
@@ -132,8 +124,10 @@ class GameObject:
             return
 
         glBegin(GL_QUADS)
+        surfaceIndex = 0
         for surface in self.meshData.surfaces:
-            glColor3fv(np.array(self.meshData.verticesColor) / 255)
+            glColor3fv(np.array(self.meshData.colors[surfaceIndex]) / 255)
+            surfaceIndex += 1
             for vertex in surface:
                 glVertex3fv(self.transformedVertices[vertex])
         glEnd()

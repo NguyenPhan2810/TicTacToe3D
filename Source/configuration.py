@@ -18,7 +18,7 @@ planeColor = [[rd.randint(100, 255) for rgb in range(0, 3)] for plane in range(0
 
 backgroundColor = (51, 51, 51)
 activeTitleColor = (5, 2, 3)
-player1Color = (0, 0, 0)
+player1Color = (255, 100, 100)
 player2Color = (255, 255, 255)
 
 # Display
@@ -29,7 +29,7 @@ nearClippingPlane = 0.1
 farClippingPlane = 50.0
 cameraZOffset = -7
 cameraXRotate = 22
-timePerFrame = 1 / 120
+timePerFrame = 1 / 30
 
 # Min-Max alg
 heuristicMaxWeigh = 1.1

@@ -14,17 +14,27 @@ class Title(GameObject):
         player2 = 2
 
     def __init__(self, color=None):
-        shape = GLShapes.Cube
-        vertx, edges, faces = shape.verticies, shape.edges, shape.surfaces
-        GameObject.__init__(self, GLMeshData(vertx, edges, faces, color))
+        GameObject.__init__(self)
+        self.defaultShape = GLShapes.Cube()
+        self.player1Shape = GLShapes.PlusShape()
+        self.player2Shape = GLShapes.PlusShape()
+        self.meshData = self.defaultShape
         self.state = Title.State(0)
-        self.color = color
         self.transform.scale[1] /= 5
+        self.color = color
 
-    def changeToColor(self, color=None):
+    def setColor(self, color):
         if color is not None:
-            self.meshData.verticesColor = [color]
+            colorList = [copy.deepcopy(color) for i in range(self.meshData.surfaces.__len__())]
+            self.meshData.colors = colorList
             self.color = color
+
+    def changeState(self, state):
+        self.state = state
+        if state == Title.State.player1:
+            self.meshData = self.player1Shape
+            self.setColor(self.color)
+            self.transform.rotation[1] = 45
 
 class Plane(GameObject):
     def __init__(self, color=None):
@@ -43,10 +53,10 @@ class Plane(GameObject):
                 row += [newTitle]
             self.titles += [row]
 
-    def changeToColor(self, color):
+    def setColor(self, color):
         for i in range(0, len(self.titles)):
             for j in range(0, len(self.titles[i])):
-                self.titles[i][j].changeToColor(color)
+                self.titles[i][j].setColor(color)
 
 class PlayGround(GameObject):
     def __init__(self):
@@ -90,11 +100,11 @@ class PlayGround(GameObject):
         for i in range(0, cfg.nTitles):
             for j in range(0, cfg.nTitles):
                 for k in range(0, cfg.nTitles):
-                    self.title3dArray[i][j][k].state = Title.State.default
+                    self.title3dArray[i][j][k].changeState(Title.State.default)
 
     def resetColor(self):
         for i in range(0, cfg.nTitles):
-            self.planes[i].changeToColor(cfg.planeColor[i])
+            self.planes[i].setColor(cfg.planeColor[i])
 
     def lateUpdate(self, deltaTime):
         GameObject.lateUpdate(self, deltaTime)
@@ -124,7 +134,7 @@ class PlayGround(GameObject):
                 r += change
                 g += change
                 b += change
-                title.changeToColor((r, g, b))
+                title.setColor((r, g, b))
 
     def setActiveTitle(self, plane=None, row=None, col=None):
         index = self.activeTitleIndex
@@ -159,11 +169,11 @@ class PlayGround(GameObject):
 
         title = self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]]
         if title.state == Title.State.default:
-            title.state = state
+            title.changeState(state)
             self.selectionCount += 1
 
             color = cfg.player1Color if state == Title.State.player1 else cfg.player2Color
-            title.changeToColor(color)
+            title.setColor(color)
 
             result = self.endgameCheck()
             self.setActiveTitle()
