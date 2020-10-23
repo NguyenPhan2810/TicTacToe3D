@@ -3,7 +3,7 @@ import pygame
 from PlayGround import *
 import configuration as cfg
 import numpy as np
-import threading
+import multiprocessing
 import random as rd
 from MinMaxAlgorithm import MinMax
 
@@ -98,7 +98,7 @@ class MinMaxController(Controller):
     def __init__(self, maxDepthSearch = cfg.maxDepthSearch, depthWeight = cfg.depthWeight, heuristicWeigh = cfg.heuristicWeigh, evaluationScore = cfg.minmaxEvaluationScore):
         GameObject.__init__(self)
         self.isStartCalculating = False
-        self.findBestMoveThread = None
+        self.findBestMoveProcess = None
         self.availableTitle = None
 
         self.isSelectTitle = False
@@ -120,7 +120,8 @@ class MinMaxController(Controller):
         Controller.reset(self)
 
         self.isStartCalculating = False
-        self.findBestMoveThread = None
+        self.findBestMoveProcess = None
+        self.bestMoveQueue = multiprocessing.Queue()
         self.availableTitle = None
 
         self.isSelectTitle = False
@@ -132,20 +133,21 @@ class MinMaxController(Controller):
         self.currentRandomMove = None
 
     def destructor(self):
-        if self.findBestMoveThread is not None:
-            self.findBestMoveThread.stop()
+        if self.findBestMoveProcess is not None:
+            self.findBestMoveProcess.terminate()
 
     def activeTitle(self, title3dArray, gameState):
         if self.availableTitle is None:
             self.prepareAvailableMove(title3dArray)
 
-        if self.findBestMoveThread is None:
-            self.findBestMoveThread = threading.Thread(target=self.findBestMove,
-                                                       args=(title3dArray, gameState))
-            self.findBestMoveThread.start()
-        elif not self.findBestMoveThread.is_alive():
-            self.findBestMoveThread = None
-
+        if self.findBestMoveProcess is None and self.bestMove is None:
+            self.findBestMoveProcess = multiprocessing.Process(target=self.findBestMove,
+                                                               args=(title3dArray, gameState, self.bestMoveQueue))
+            self.findBestMoveProcess.start()
+        elif not self.findBestMoveProcess.is_alive():
+            self.bestMove = self.bestMoveQueue.get()
+            self.findBestMoveProcess = None
+            
         self.isCalculating = self.bestMove is None
 
         if not self.isStartCalculating and self.isCalculating and not self.isSelectTitle:
@@ -169,10 +171,8 @@ class MinMaxController(Controller):
             return True
         return False
 
-    def findBestMove(self, title3dArray, gameState):
+    def findBestMove(self, title3dArray, gameState, queue):
         timeStart = pygame.time.get_ticks()
-        if self.bestMove is not None:
-            return
 
         bestEvaluation = -math.inf
         n = cfg.nTitles
@@ -206,7 +206,7 @@ class MinMaxController(Controller):
             elif moveEvaluation == bestEvaluation:
                 bestMoves += [[p, r, c]]
 
-        self.bestMove = rd.choice(bestMoves)
+        queue.put(rd.choice(bestMoves))
         timeEnd = pygame.time.get_ticks()
         totalTime = (timeEnd - timeStart) / 1000
         print("Move calculated in ", totalTime, " seconds")
