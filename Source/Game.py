@@ -7,6 +7,7 @@ import MenuState
 
 class Game:
     def __init__(self):
+        self.statesStackChanged = False
         pygame.init()
         self.isGameRunning = True
 
@@ -28,7 +29,10 @@ class Game:
                 # Proceed
                 self.eventHandling()
                 self.update(dt)
-                self.render()
+                if self.statesStackChanged:
+                    self.statesStackChanged = False
+                else:
+                    self.render()
 
         for state in self.statesStack:
             state.destructor()
@@ -47,11 +51,13 @@ class Game:
     def popState(self, index = 0):
         state = self.statesStack.pop(index)
         state.destructor()
+        self.statesStackChanged = True
         return state
 
     def pushState(self, state):
         state.constructor()
         self.statesStack.insert(0, state)
+        self.statesStackchanged = True
 
     def update(self, deltaTime: float):
         stackSize = len(self.statesStack)

@@ -29,7 +29,6 @@ class PlayState(BaseState):
         self.previousMousePosition = np.array([0, 0, 0])
         self.mouseHold = False
 
-
     def constructor(self):
         BaseState.constructor(self)
 
@@ -39,6 +38,7 @@ class PlayState(BaseState):
         glFrontFace(GL_CW)
         glTranslatef(0, 0, cfg.cameraZOffset)
         glRotatef(cfg.cameraXRotate, 1, 0, 0)
+        glClearColor(cfg.backgroundColor[0] / 255, cfg.backgroundColor[1] / 255, cfg.backgroundColor[2] / 255, 1)
 
         self.objectRoot.reset()
         self.state = GameStatus.player1
@@ -71,18 +71,18 @@ class PlayState(BaseState):
 
         return False
 
-    def requestPushState(self):
-        return self.pushState
-
     def update(self, deltaTime: float) -> bool:
+        # Terminal check
         if self.exit:
             from MenuState import MenuState
             self.pushState = MenuState()
             return False
 
+        # Update object tree
         BaseState.update(self, deltaTime)
         self.objectRoot.update(deltaTime)
 
+        # Update playground
         if self.mouseHold:
             mousePos = pygame.mouse.get_pos()
             rotationX = (mousePos[1] - self.previousMousePosition[1]) * cfg.mouseRotationSensitivity
@@ -92,6 +92,10 @@ class PlayState(BaseState):
             glRotatef(abs(rotationX), rotationX, 0, 0)
             self.playGround.transform.rotation[1] -= rotationY
 
+        # Check picking
+        self.updatePicking()
+
+        # Game over
         if not self.isGameOver():
             self.controller()
 
@@ -105,8 +109,6 @@ class PlayState(BaseState):
     def render(self):
         # Clear screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glClearColor(cfg.backgroundColor[0] / 255, cfg.backgroundColor[1] / 255, cfg.backgroundColor[2] / 255, 1)
-
         BaseState.render(self)
 
         # Draw to buffer
@@ -145,3 +147,16 @@ class PlayState(BaseState):
                     self.state = self.state.player1
             elif type(checkState) is not bool:
                 self.state = GameStatus.gameOver
+
+    def requestPushState(self):
+        return self.pushState
+
+    def updatePicking(self):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        self.objectRoot.drawPicking()
+
+        x, y = pygame.mouse.get_pos()
+        y = cfg.displaySize[1] - y # This is to match OpenGL and pygame up
+        r,g,b = glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
+        pixelColor = (r, g, b)
+        self.objectRoot.updatePicking(pixelColor)

@@ -93,13 +93,8 @@ class PlayGround(GameObject):
                     self.title3dArray[i][j][k].state = Title.State.default
 
     def resetColor(self):
-        index = 0
         for i in range(0, cfg.nTitles):
-            for j in range(0, cfg.nTitles):
-                for k in range(0, cfg.nTitles):
-                    title = self.title3dArray[i][j][k]
-                    title.changeToColor(cfg.titlesColor[index])
-                    index += 1
+            self.planes[i].changeToColor(cfg.planeColor[i])
 
     def lateUpdate(self, deltaTime):
         GameObject.lateUpdate(self, deltaTime)

@@ -31,6 +31,8 @@ class HumanController(Controller):
         self.isMouseUp = False
         self.pickingTitle = None
 
+        self.title3dArray = None
+
     def reset(self):
         Controller.reset(self)
         self.isSelectTitle = False
@@ -66,22 +68,19 @@ class HumanController(Controller):
         return False
 
     def activeTitle(self, title3dArray, gameState):
+        self.title3dArray =  title3dArray
         return self.pickingTitle
 
     def mouseHover(self):
-        x, y = pygame.mouse.get_pos()
-        y = cfg.displaySize[1] - y # This is to match OpenGL and pygame up
-        r,g,b = glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
-        pixelColor = (r, g, b)
+        if self.title3dArray is None:
+            return
 
-        i = 0
         n = cfg.nTitles
         colorIndex = 0
         for i in range(0, n):
             for j in range(0, n):
                 for k in range(0, n):
-                    color = cfg.titlesColor[colorIndex]
-                    if pixelColor[0] == color[0] and pixelColor[1] == color[1] and pixelColor[2] == color[2]:
+                    if self.title3dArray[i][j][k].isPicked:
                         self.pickingTitle = [i, j, k]
                         break
                     colorIndex += 1

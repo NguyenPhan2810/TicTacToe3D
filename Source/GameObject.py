@@ -21,12 +21,19 @@ class GLMeshData:
 # update method is to update logic, state of an object
 # render method helps the object to be visible
 class GameObject:
+    id = 0
     def __init__(self, glObjectData: GLMeshData=None):
         self.transform = Transform()
         self.globalTransform = Transform()
         self.meshData = glObjectData
+        self.transformedVertices = None
+
         self.children = []
         self.parent = None
+
+        self.isPicked = False # If this object is picked by the mouse or not
+        self.id = GameObject.id
+        GameObject.id += 1
 
     def setParent(self, parent):
         self.parent = parent
@@ -53,14 +60,37 @@ class GameObject:
             self.updateRotation()
 
     def lateUpdate(self, deltaTime: float):
-        for i in range(0, len(self.children)):
-            self.children[i].lateUpdate(deltaTime)
+        if self.meshData is not None:
+            self.transformedVertices = self.glCalculateTransform(self.meshData.vertices)
+
+        for child in self.children:
+            child.lateUpdate(deltaTime)
 
     def draw(self):
         if self.meshData is not None:
             self.glDraw()
         for i in range(0, len(self.children)):
             self.children[i].draw()
+
+    def drawPicking(self):
+        if self.meshData is not None:
+            self.glDrawPicking()
+        for i in range(0, len(self.children)):
+            self.children[i].drawPicking()
+
+
+    # Return true if this object or children picked
+    def updatePicking(self, pickedColor):
+        if self.idToColor() == pickedColor:
+            self.isPicked = True
+            return True
+        else:
+            self.isPicked = False
+            for child in self.children:
+                if child.updatePicking(pickedColor):
+                    return True
+            else:
+                return False
 
     def updateTransform(self):
         if self.parent is not None:
@@ -97,14 +127,32 @@ class GameObject:
 
         return vertices
 
-
     def glDraw(self):
-        vertices = self.glCalculateTransform(self.meshData.vertices)
+        if self.transformedVertices is None:
+            return
+
         glBegin(GL_QUADS)
         for surface in self.meshData.surfaces:
             glColor3fv(np.array(self.meshData.verticesColor) / 255)
             for vertex in surface:
-                glVertex3fv(vertices[vertex])
+                glVertex3fv(self.transformedVertices[vertex])
+        glEnd()
+
+    def idToColor(self):
+        r = (self.id & 0x0000ff) >> 0
+        g = (self.id & 0x00ff00) >> 8
+        b = (self.id & 0xff0000) >> 16
+        return (r, g, b)
+
+    def glDrawPicking(self):
+        if self.transformedVertices is None:
+            return
+
+        glBegin(GL_QUADS)
+        glColor3fv(np.array(self.idToColor()) / 255)
+        for surface in self.meshData.surfaces:
+            for vertex in surface:
+                glVertex3fv(self.transformedVertices[vertex])
         glEnd()
 
     def move(self, direction):
