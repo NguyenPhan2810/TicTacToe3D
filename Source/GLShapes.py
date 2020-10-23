@@ -89,6 +89,14 @@ class XShape(GLShape):
             [1, 1, lengthProportion]
         ]
 
+        cos45 = math.cos(math.radians(45))
+        sin45 = math.sin(math.radians(45))
+        for vertex in vertices:
+            x = vertex[0]
+            z = vertex[2]
+            vertex[0] = x * cos45 - z * sin45
+            vertex[2] = x * sin45 + z * cos45
+
         GLShape.__init__(self, vertices, XShape.edges, XShape.surfaces, surfaceColor)
 
 class OShape(GLShape):

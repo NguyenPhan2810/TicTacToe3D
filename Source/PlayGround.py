@@ -32,7 +32,6 @@ class Title(GameObject):
         self.state = state
         if state == Title.State.player1:
             self.meshData = self.player1Shape
-            #self.transform.rotation[1] = 45
         elif state == Title.State.player2:
             self.meshData = self.player2Shape
         else:
@@ -53,6 +52,7 @@ class Plane(GameObject):
                 newTitle.transform.position[0] = self.transform.position[0] + x
                 newTitle.transform.position[2] = self.transform.position[2] + z
                 newTitle.transform.scale /= (n + cfg.titlesPadding)
+                newTitle.transform.rotation[1] = 45
                 newTitle.setParent(self)
                 row += [newTitle]
             self.titles += [row]

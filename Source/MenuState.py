@@ -31,10 +31,12 @@ class MenuState(BaseState):
         mvp = Button(self.screen, "Machine VS Person", (posX, posY + 50), 60)
         mvm = Button(self.screen, "Machine VS Machine", (posX, posY + 150), 60)
 
-        pvp.playState = PlayState.PlayState(HumanController(), HumanController())
-        pvm.playState = PlayState.PlayState(HumanController(), MinMaxController())
-        mvp.playState = PlayState.PlayState(MinMaxController(), HumanController())
-        mvm.playState = PlayState.PlayState(MinMaxController(), MinMaxController())
+        human = HumanController()
+        minmax = MinMaxController()
+        pvp.playState = PlayState.PlayState(human, human)
+        pvm.playState = PlayState.PlayState(human, minmax)
+        mvp.playState = PlayState.PlayState(minmax, human)
+        mvm.playState = PlayState.PlayState(minmax, minmax)
 
         self.buttons = [pvp, pvm, mvp, mvm]
 

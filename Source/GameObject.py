@@ -99,17 +99,12 @@ class GameObject:
             self.globalTransform.rotation = self.parent.globalTransform.rotation + self.transform.rotation
 
     def updateRotation(self):
-        if self.children is None:
-            return
-
-        rotMat = rotationMatrix(self.transform.rotation)
-
+        rotMat = rotationMatrix(self.globalTransform.rotation)
         self.globalTransform.position = np.matmul(rotMat, self.globalTransform.position)
 
-        self.updateChildRotation(rotMat)
-
-        for child in self.children:
-            child.updateRotation()
+        if self.children is not None:
+            for child in self.children:
+                child.updateRotation()
 
     def updateChildRotation(self, rotationMatrix):
             for child in self.children:
