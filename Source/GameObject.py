@@ -60,11 +60,11 @@ class GameObject:
             self.updateRotation()
 
     def lateUpdate(self, deltaTime: float):
-        if self.meshData is not None:
-            self.transformedVertices = self.glCalculateTransform(self.meshData.vertices)
-
         for child in self.children:
             child.lateUpdate(deltaTime)
+
+        if self.meshData is not None:
+            self.transformedVertices = self.glCalculateTransform(self.meshData.vertices)
 
     def draw(self):
         if self.meshData is not None:
@@ -167,7 +167,8 @@ def rotationMatrix(rotation):
     yawMat = np.array([[cos(alpha), sin(alpha), 0], [-sin(alpha), cos(alpha), 0], [0, 0, 1]])
     pitchMat = np.array([[cos(beta), 0, -sin(beta)], [0, 1, 0], [sin(beta), 0, cos(beta)]])
     rollMat = np.array([[1, 0, 0], [0, cos(yeta), sin(yeta)], [0, -sin(yeta), cos(yeta)]])
-    rotationMat = np.matmul(yawMat, pitchMat, rollMat)
+    rotationMat = np.matmul(yawMat, pitchMat)
+    rotationMat = np.matmul(rotationMat, rollMat)
 
     return rotationMat
 

@@ -47,7 +47,7 @@ heuristicWeigh = 5
 maxDepthSearch  = 2
 depthWeight = 10
 minmaxEvaluationScore = 10000
-alphabetaPrunning = True
+alphabetaPrunning = False
 
 # MinMaxController
 timeProportionRandomMove = 0.5
