@@ -42,6 +42,11 @@ class Plane(GameObject):
     def __init__(self, color=None):
         GameObject.__init__(self)
         self.color = color
+        self.titles = None
+
+    def constructor(self):
+        super().constructor()
+
         self.titles = [[Title() for c in range(cfg.nTitles)] for r in range(cfg.nTitles)]
         for r in range(cfg.nTitles):
             for c in range(cfg.nTitles):
@@ -49,6 +54,7 @@ class Plane(GameObject):
         self.setupTitles()
 
     def reset(self):
+        super().reset()
         self.setupTitles()
 
     def setupTitles(self):
@@ -78,12 +84,23 @@ class PlayGround(GameObject):
     def __init__(self):
         GameObject.__init__(self)
 
+        self.title3dArray = []
         self.terminalTitlesColor = None
         self.terminalTitles = None
         self.totalTime = 0.0
+        self.transform.scale = cfg.playGroundScale
 
         self.planes = []
-        self.transform.scale = cfg.playGroundScale
+
+        self.selectionCount = 0
+        self.activeTitleIndex = None
+        self.activeTitlePreservedTransform = None
+
+    def constructor(self):
+        super().constructor()
+
+        for plane in self.planes:
+            plane.constructor()
 
         n = cfg.nTitles
         for y in np.arange(-0.5, 0.51, 1.0 / (n - 1)):  # Make planes center to 0
@@ -93,21 +110,14 @@ class PlayGround(GameObject):
             newPlane.setParent(self)
             self.planes += [newPlane]
 
-        self.selectionCount = 0
-        self.activeTitleIndex = None
-        self.activeTitlePreservedTransform = None
-
-        self.title3dArray = []
         for i in range(0, n):
             self.title3dArray += [self.planes[i].titles]
 
-        # Setup color
         self.resetColor()
-
         self.setActiveTitle()
 
     def reset(self):
-        GameObject.reset(self)
+        super().reset()
 
         self.totalTime = 0.0
         self.terminalTitles = None
@@ -118,7 +128,8 @@ class PlayGround(GameObject):
             self.planes[i].setColor(cfg.planeColor[i])
 
     def lateUpdate(self, deltaTime):
-        GameObject.lateUpdate(self, deltaTime)
+        super().lateUpdate(deltaTime)
+
         self.totalTime += deltaTime
 
         if self.activeTitleIndex is not None:

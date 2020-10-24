@@ -25,12 +25,12 @@ class PlayState(BaseState):
         for player in self.players:
             player.setParent(self.objectRoot)
 
-
         self.previousMousePosition = np.array([0, 0, 0])
         self.mouseHold = False
 
     def constructor(self):
-        BaseState.constructor(self)
+        super().constructor()
+
         self.objectRoot.constructor()
 
         pygame.display.set_mode(cfg.displaySize, DOUBLEBUF | OPENGL)
