@@ -3,9 +3,9 @@ import pygame
 # Playground
 nTitles = 3 # must be > 1
 
-titleXThickness = 0.25
+titleXThickness = 0.1
 titleOThickness = 0.3
-titleOSegments = 6
+titleOSegments = 10
 
 titleWiggleAmount = 0.02
 titleWiggleFrequency = 20

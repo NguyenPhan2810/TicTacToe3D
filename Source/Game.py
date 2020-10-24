@@ -7,8 +7,8 @@ import MenuState
 
 class Game:
     def __init__(self):
-        pygame.init()
         self.statesStackChanged = False
+        pygame.init()
         self.isGameRunning = True
 
         self.statesStack = []
