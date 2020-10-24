@@ -7,7 +7,6 @@ import configuration as cfg
 from pygame.locals import *
 import enum
 
-
 class GameStatus(enum.Enum):
     player1 = 0
     player2 = 1
@@ -60,7 +59,8 @@ class PlayState(BaseState):
 
         for event in events:
             if event.type == pygame.KEYDOWN:
-                self.reset()
+                if event.key == pygame.K_SPACE:
+                    self.reset()
                 if event.key == pygame.K_ESCAPE:
                     self.exit = True
             elif event.type == pygame.MOUSEBUTTONDOWN:

@@ -31,7 +31,7 @@ cameraXRotate = 22
 timePerFrame = 1 / 24
 
 # Min-Max alg
-heuristicMaxWeigh = 1.1
+heuristicMaxWeigh = 1
 heuristicMinWeigh = 1
 heuristicWeigh = 50
 heuristicPriorityWeigh = 500
@@ -42,7 +42,7 @@ alphabetaPrunning = True
 
 # MinMaxController
 timeProportionRandomMove = 0.8
-waitingTime = 5
+waitingTime = 3
 waitingRandomTimeInterval = 0.5
 
 # Main menu
