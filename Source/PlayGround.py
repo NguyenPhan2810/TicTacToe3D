@@ -112,6 +112,7 @@ class PlayGround(GameObject):
         self.totalTime = 0.0
         self.selectionCount = 0
         self.terminalTitles = None
+        self.terminalTitlesColor = None
         self.resetColor()
 
     def resetColor(self):

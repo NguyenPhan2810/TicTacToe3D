@@ -32,9 +32,9 @@ timePerFrame = 1 / 24
 
 # Min-Max alg
 heuristicMaxWeigh = 1
-heuristicMinWeigh = 1.1
+heuristicMinWeigh = 1
 heuristicWeigh = 50
-heuristicPriorityWeigh = 500
+heuristicPriorityWeigh = 1000
 maxDepthSearch  = 1
 depthWeight = 1
 minmaxEvaluationScore = 10000
