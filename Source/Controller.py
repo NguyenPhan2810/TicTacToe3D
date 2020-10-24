@@ -6,6 +6,7 @@ import numpy as np
 import multiprocessing
 import random as rd
 from MinMaxAlgorithm import MinMax
+import time
 
 class Controller(GameObject):
     def __init__(self):
@@ -176,8 +177,7 @@ class MinMaxController(Controller):
 
     def findBestMove(self, title3dArray, gameState, queue):
         print("Started finding move")
-        import datetime
-        timeStart = datetime.datetime.now()
+        timeStart = time.time()
 
         bestEvaluation = -math.inf
         n = cfg.nTitles
@@ -213,8 +213,8 @@ class MinMaxController(Controller):
 
         queue.put(rd.choice(bestMoves))
 
-        timeEnd = datetime.datetime.now()
-        totalTime = (timeEnd - timeStart).seconds
+        timeEnd = time.time()
+        totalTime = (timeEnd - timeStart)
         print("Move calculated in ", totalTime, " seconds")
 
     def prepareAvailableMove(self, title3dArray):

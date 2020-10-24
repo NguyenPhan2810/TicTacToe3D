@@ -182,7 +182,7 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     title.state = preserveState
 
                     # Alpha beta pruning
-                    if beta <= alpha and cfg.alphabetaPrunning:
+                    if beta <= alpha and cfg.alphabetaPruning:
                         break
                 else: continue
                 break
@@ -212,7 +212,7 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     title.state = preserveState
 
                     # Alpha beta pruning
-                    if beta <= alpha and cfg.alphabetaPrunning:
+                    if beta <= alpha and cfg.alphabetaPruning:
                         break
                 else: continue
                 break
