@@ -153,8 +153,7 @@ def Heuristic(title3dArray, minTitleState, maxTitleState):
 
     # maxCount and minCount squared means the more titles in a row the weigher the score is
     # minus totalNoneCount means the less None Title the weigher the score is
-    # 2 * totalMinCount because 2 minTitle in a row is the most dangerous
-    score = (totalMaxCount * cfg.heuristicMaxWeigh + totalMinCount * cfg.heuristicMinWeigh - totalNoneCount)
+    score = (math.pow(totalMaxCount, 2) * cfg.heuristicMaxWeigh - math.pow(totalMinCount, 2) * cfg.heuristicMinWeigh - totalNoneCount)
 
     return score
 

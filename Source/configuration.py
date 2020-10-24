@@ -1,17 +1,17 @@
 import pygame
 
 # Playground
-nTitles = 4 # must be > 1
+nTitles = 3 # must be > 1
 
-titleXThickness = 0.25
-titleOThickness = 0.4
+titleXThickness = 0.1
+titleOThickness = 0.2
 titleOSegments = 6
 
-titleWiggleAmount = 0.05
+titleWiggleAmount = 0.00
 titleWiggleFrequency = 4
 titleScaleAmount = 0.02
 titleScaleFrequency = 20
-titleSelectedScaleMultiplier = 1.8
+titleSelectedScaleMultiplier = 1.1
 
 terminalTitleColorChangeFreq = 5
 terminalTitleColorChangeAmount = 70
@@ -19,16 +19,6 @@ terminalTitleColorChangeAmount = 70
 playGroundScale = [1, 1, 1]
 mouseRotationSensitivity = 0.3
 titlesPadding = 1
-
-# Colors
-import random as rd
-planeColor = [[rd.randint(100, 255) for rgb in range(0, 3)] for plane in range(0, nTitles)]
-
-backgroundColor = (51, 51, 51)
-activeTitleColor = (5, 2, 3)
-inactiveTitleColor = (100, 100, 100)
-player1Color = (255, 90, 90)
-player2Color = (100, 90, 255)
 
 # Display
 displaySize = (800, 800)
@@ -41,20 +31,42 @@ cameraXRotate = 22
 timePerFrame = 1 / 24
 
 # Min-Max alg
-heuristicMaxWeigh = 1.1
-heuristicMinWeigh = 1
+heuristicMaxWeigh = 1
+heuristicMinWeigh = 1.1
 heuristicWeigh = 5
-maxDepthSearch  = 2
-depthWeight = 10
+maxDepthSearch  = 1
+depthWeight = 1
 minmaxEvaluationScore = 10000
 alphabetaPrunning = True
 
 # MinMaxController
-timeProportionRandomMove = 0.5
-waitingTime = 2
+timeProportionRandomMove = 0.8
+waitingTime = 5
 waitingRandomTimeInterval = 0.5
 
 # Main menu
 mainmenuTextColor = (255, 255, 255)
 mainmenuTextColorHovered = (235, 124, 165)
 mainmenuTextColorClicked = (255, 144, 205)
+
+
+
+# Colors
+import random as rd
+colorSpace = [
+    [120, 178, 210],
+    [150, 220, 100],
+    [110, 150, 100],
+    [140, 210, 240],
+    [210, 130, 190],
+    [200, 200, 200],
+]
+if nTitles > len(colorSpace):
+    colorSpace *= nTitles // len(colorSpace)
+planeColor = rd.sample(colorSpace, nTitles)
+
+backgroundColor = (51, 51, 51)
+activeTitleColor = (5, 2, 3)
+inactiveTitleColor = (100, 100, 100)
+player1Color = (255, 90, 90)
+player2Color = (100, 90, 255)

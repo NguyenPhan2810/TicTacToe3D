@@ -13,6 +13,7 @@ class GameStatus(enum.Enum):
     player2 = 1
     gameOver = 2
 
+
 class PlayState(BaseState):
     def __init__(self, player1Controller, player2Controller):
         self.exit = False
@@ -25,8 +26,6 @@ class PlayState(BaseState):
         for player in self.players:
             player.setParent(self.objectRoot)
 
-
-        self.previousMousePosition = np.array([0, 0, 0])
         self.mouseHold = False
 
     def constructor(self):
@@ -52,7 +51,6 @@ class PlayState(BaseState):
         self.state = GameStatus.player1
         self.state = GameStatus(0)
 
-        self.previousMousePosition = np.array([0, 0, 0])
         self.mouseHold = False
         self.pushState = None
         self.exit = False
@@ -66,7 +64,7 @@ class PlayState(BaseState):
                 if event.key == pygame.K_ESCAPE:
                     self.exit = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                self.previousMousePosition = pygame.mouse.get_pos()
+                pygame.mouse.get_rel()
                 self.mouseHold = True
             elif event.type == pygame.MOUSEBUTTONUP:
                 self.mouseHold = False
@@ -88,11 +86,9 @@ class PlayState(BaseState):
 
         # Update playground
         if self.mouseHold:
-            mousePos = pygame.mouse.get_pos()
-            rotationX = (mousePos[1] - self.previousMousePosition[1]) * cfg.mouseRotationSensitivity
-            rotationY = (mousePos[0] - self.previousMousePosition[0]) * cfg.mouseRotationSensitivity
-            self.previousMousePosition = mousePos
-
+            dx, dy = pygame.mouse.get_rel()
+            rotationX = dy * cfg.mouseRotationSensitivity
+            rotationY = dx * cfg.mouseRotationSensitivity
             glRotatef(abs(rotationX), rotationX, 0, 0)
             self.playGround.transform.rotation[1] -= rotationY
 
@@ -160,7 +156,7 @@ class PlayState(BaseState):
         self.objectRoot.drawPicking()
 
         x, y = pygame.mouse.get_pos()
-        y = cfg.displaySize[1] - y # This is to match OpenGL and pygame up
-        r,g,b = glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
+        y = cfg.displaySize[1] - y  # This is to match OpenGL and pygame up
+        r, g, b = glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
         pixelColor = (r, g, b)
         self.objectRoot.updatePicking(pixelColor)
