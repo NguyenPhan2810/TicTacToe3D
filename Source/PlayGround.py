@@ -127,7 +127,7 @@ class PlayGround(GameObject):
 
             dx = cfg.titleWiggleAmount * math.cos(self.totalTime * cfg.titleWiggleFrequency)
             dz = cfg.titleWiggleAmount * math.sin(self.totalTime * cfg.titleWiggleFrequency)
-            ds = cfg.titleScaleAmount * math.sin(self.totalTime * cfg.titleScaleFrequency)
+            ds = cfg.titleScaleAmount * (1 + math.sin(self.totalTime * cfg.titleScaleFrequency))
             newX = oldTransform.position[0] + dx
             newZ = oldTransform.position[2] + dz
             newS = oldTransform.scale + ds

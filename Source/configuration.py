@@ -1,15 +1,15 @@
 import pygame
 
 # Playground
-nTitles = 3 # must be > 1
+nTitles = 4 # must be > 1
 
-titleXThickness = 0.1
-titleOThickness = 0.3
-titleOSegments = 10
+titleXThickness = 0.25
+titleOThickness = 0.4
+titleOSegments = 6
 
-titleWiggleAmount = 0.02
-titleWiggleFrequency = 20
-titleScaleAmount = 0.01
+titleWiggleAmount = 0.05
+titleWiggleFrequency = 4
+titleScaleAmount = 0.02
 titleScaleFrequency = 20
 titleSelectedScaleMultiplier = 1.8
 
@@ -22,7 +22,7 @@ titlesPadding = 1
 
 # Colors
 import random as rd
-planeColor = [[rd.randint(140, 230) for rgb in range(0, 3)] for plane in range(0, nTitles)]
+planeColor = [[rd.randint(100, 255) for rgb in range(0, 3)] for plane in range(0, nTitles)]
 
 backgroundColor = (51, 51, 51)
 activeTitleColor = (5, 2, 3)
@@ -38,7 +38,7 @@ nearClippingPlane = 0.1
 farClippingPlane = 50.0
 cameraZOffset = -7
 cameraXRotate = 22
-timePerFrame = 1 / 30
+timePerFrame = 1 / 24
 
 # Min-Max alg
 heuristicMaxWeigh = 1.1
@@ -47,7 +47,7 @@ heuristicWeigh = 5
 maxDepthSearch  = 2
 depthWeight = 10
 minmaxEvaluationScore = 10000
-alphabetaPrunning = False
+alphabetaPrunning = True
 
 # MinMaxController
 timeProportionRandomMove = 0.5
