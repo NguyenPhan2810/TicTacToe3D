@@ -4,156 +4,139 @@ import copy
 import math
 
 # Reference: https://www3.ntu.edu.sg/home/ehchua/programming/java/JavaGame_TicTacToe_AI.html#:~:text=In%20Tic%2DTac%2DToe%2C,two%20empty%20cells)%20for%20computer.
-def Heuristic(title3dArray, minTitleState, maxTitleState):
+def Heuristic(title3dArray, scoreState):
     score = 0
+    weigh = cfg.heuristicWeigh
+    priorityWeigh = cfg.heuristicPriorityWeigh
     arr = title3dArray
     n = cfg.nTitles
-
-    totalMaxCount = totalMinCount = totalNoneCount = 0
 
     # Check plane
     for r in range(0, n):
         for c in range(0, n):
-            maxCount = minCount = noneCount = 0
+            maxCount = noneCount = 0
             for p in range(0, n):
-                if arr[p][r][c].state == maxTitleState: maxCount += 1
-                elif arr[p][r][c].state == minTitleState: minCount += 1
-                else: noneCount += 1
-            totalMaxCount += maxCount * maxCount
-            totalMinCount += minCount * minCount
-            totalNoneCount += noneCount * noneCount
+                if arr[p][r][c].state == scoreState: maxCount += 1
+                elif arr[p][r][c].state == PlayGround.Title.State.default: noneCount += 1
+            if maxCount + noneCount == n:
+                if noneCount < 2: score += priorityWeigh
+                else: score += weigh * maxCount
 
     # Check row
     for p in range(0, n):
         for c in range(0, n):
-            maxCount = minCount = noneCount = 0
+            maxCount = noneCount = 0
             for r in range(0, n):
-                if arr[p][r][c].state == maxTitleState: maxCount += 1
-                elif arr[p][r][c].state == minTitleState: minCount += 1
-                else: noneCount += 1
-            totalMaxCount += maxCount * maxCount
-            totalMinCount += minCount * minCount
-            totalNoneCount += noneCount * noneCount
+                if arr[p][r][c].state == scoreState: maxCount += 1
+                elif arr[p][r][c].state == PlayGround.Title.State.default: noneCount += 1
+            if maxCount + noneCount == n:
+                if noneCount < 2: score += priorityWeigh
+                else: score += weigh * maxCount
 
     # Check col
     for p in range(0, n):
         for r in range(0, n):
-            maxCount = minCount = noneCount = 0
+            maxCount = noneCount = 0
             for c in range(0, n):
-                if arr[p][r][c].state == maxTitleState: maxCount += 1
-                elif arr[p][r][c].state == minTitleState: minCount += 1
-                else: noneCount += 1
-            totalMaxCount += maxCount * maxCount
-            totalMinCount += minCount * minCount
-            totalNoneCount += noneCount * noneCount
+                if arr[p][r][c].state == scoreState: maxCount += 1
+                elif arr[p][r][c].state == PlayGround.Title.State.default: noneCount += 1
+            if maxCount + noneCount == n:
+                if noneCount < 2: score += priorityWeigh
+                else: score += weigh * maxCount
 
     # Check diagonal
     for p in range(0, n):
-        maxCount = minCount = noneCount = 0
+        maxCount = noneCount = 0
         for i in range(0, n):
-            if arr[p][i][i].state == maxTitleState: maxCount += 1
-            elif arr[p][i][i].state == minTitleState: minCount += 1
-            else: noneCount += 1
-        totalMaxCount += maxCount * maxCount
-        totalMinCount += minCount * minCount
-        totalNoneCount += noneCount * noneCount
+            if arr[p][i][i].state == scoreState: maxCount += 1
+            elif arr[p][i][i].state == PlayGround.Title.State.default: noneCount += 1
+        if maxCount + noneCount == n:
+            if noneCount < 2: score += priorityWeigh
+            else: score += weigh * maxCount
 
     # Check anti-diagonal
     for p in range(0, n):
-        maxCount = minCount = noneCount = 0
+        maxCount = noneCount = 0
         for i in range(0, n):
-            if arr[p][i][n - 1 - i].state == maxTitleState: maxCount += 1
-            elif arr[p][i][n - 1 - i].state == minTitleState: minCount += 1
-            else: noneCount += 1
-        totalMaxCount += maxCount * maxCount
-        totalMinCount += minCount * minCount
-        totalNoneCount += noneCount * noneCount
+            if arr[p][i][n - 1 - i].state == scoreState: maxCount += 1
+            elif arr[p][i][n - 1 - i].state == PlayGround.Title.State.default: noneCount += 1
+        if maxCount + noneCount == n:
+            if noneCount < 2: score += priorityWeigh
+            else: score += weigh * maxCount
 
     # Check multiplane row
     for c in range(0, n):
-        maxCount = minCount = noneCount = 0
+        maxCount = noneCount = 0
         for i in range(0, n):
-            if arr[i][i][c].state == maxTitleState: maxCount += 1
-            elif arr[i][i][c].state == minTitleState: minCount += 1
-            else: noneCount += 1
-        totalMaxCount += maxCount * maxCount
-        totalMinCount += minCount * minCount
-        totalNoneCount += noneCount * noneCount
+            if arr[i][i][c].state == scoreState: maxCount += 1
+            elif arr[i][i][c].state == PlayGround.Title.State.default: noneCount += 1
+        if maxCount + noneCount == n:
+            if noneCount < 2: score += priorityWeigh
+            else: score += weigh * maxCount
 
     # Check multiplane anti-row
     for c in range(0, n):
-        maxCount = minCount = noneCount = 0
+        maxCount = noneCount = 0
         for i in range(0, n):
-            if arr[n - 1 - i][i][c].state == maxTitleState: maxCount += 1
-            elif arr[n - 1 - i][i][c].state == minTitleState: minCount += 1
-            else: noneCount += 1
-        totalMaxCount += maxCount * maxCount
-        totalMinCount += minCount * minCount
-        totalNoneCount += noneCount * noneCount
+            if arr[n - 1 - i][i][c].state == scoreState: maxCount += 1
+            elif arr[n - 1 - i][i][c].state == PlayGround.Title.State.default: noneCount += 1
+        if maxCount + noneCount == n:
+            if noneCount < 2: score += priorityWeigh
+            else: score += weigh * maxCount
 
     # Check multiplane col
     for r in range(0, n):
-        maxCount = minCount = noneCount = 0
+        maxCount = noneCount = 0
         for i in range(0, n):
-            if arr[i][r][i].state == maxTitleState: maxCount += 1
-            elif arr[i][r][i].state == minTitleState: minCount += 1
-            else: noneCount += 1
-        totalMaxCount += maxCount * maxCount
-        totalMinCount += minCount * minCount
-        totalNoneCount += noneCount * noneCount
+            if arr[i][r][i].state == scoreState: maxCount += 1
+            elif arr[i][r][i].state == PlayGround.Title.State.default: noneCount += 1
+        if maxCount + noneCount == n:
+            if noneCount < 2: score += priorityWeigh
+            else: score += weigh * maxCount
 
     # Check multiplane anti-col
     for r in range(0, n):
-        maxCount = minCount = noneCount = 0
+        maxCount = noneCount = 0
         for i in range(0, n):
-            if arr[n - 1 - i][r][i].state == maxTitleState: maxCount += 1
-            elif arr[n - 1 - i][r][i].state == minTitleState: minCount += 1
-            else: noneCount += 1
-        totalMaxCount += maxCount * maxCount
-        totalMinCount += minCount * minCount
-        totalNoneCount += noneCount * noneCount
+            if arr[n - 1 - i][r][i].state == scoreState: maxCount += 1
+            elif arr[n - 1 - i][r][i].state == PlayGround.Title.State.default: noneCount += 1
+        if maxCount + noneCount == n:
+            if noneCount < 2: score += priorityWeigh
+            else: score += weigh * maxCount
 
     # Check multiplane diagonal
-    maxCount = minCount = noneCount = 0
+    maxCount = noneCount = 0
     for i in range(0, n):
-        if arr[i][i][i].state == maxTitleState: maxCount += 1
-        elif arr[i][i][i].state == minTitleState: minCount += 1
-        else: noneCount += 1
-    totalMaxCount += maxCount * maxCount
-    totalMinCount += minCount * minCount
-    totalNoneCount += noneCount * noneCount
+        if arr[i][i][i].state == scoreState: maxCount += 1
+        elif arr[i][i][i].state == PlayGround.Title.State.default: noneCount += 1
+    if maxCount + noneCount == n:
+        if noneCount < 2: score += priorityWeigh
+        else: score += weigh * maxCount
 
-    maxCount = minCount = noneCount = 0
+    maxCount = noneCount = 0
     for i in range(0, n):
-        if arr[n - 1 - i][i][i].state == maxTitleState: maxCount += 1
-        elif arr[n - 1 - i][i][i].state == minTitleState: minCount += 1
-        else: noneCount += 1
-    totalMaxCount += maxCount * maxCount
-    totalMinCount += minCount * minCount
-    totalNoneCount += noneCount * noneCount
+        if arr[n - 1 - i][i][i].state == scoreState: maxCount += 1
+        elif arr[n - 1 - i][i][i].state == PlayGround.Title.State.default: noneCount += 1
+    if maxCount + noneCount == n:
+        if noneCount < 2: score += priorityWeigh
+        else: score += weigh * maxCount
 
     # Check multiplane anti-diagonal
-    maxCount = minCount = noneCount = 0
+    maxCount = noneCount = 0
     for i in range(0, n):
-        if arr[i][i][n - 1 - i].state == maxTitleState: maxCount += 1
-        elif arr[i][i][n - 1 - i].state == minTitleState: minCount += 1
-        else: noneCount += 1
-    totalMaxCount += maxCount * maxCount
-    totalMinCount += minCount * minCount
-    totalNoneCount += noneCount * noneCount
+        if arr[i][i][n - 1 - i].state == scoreState: maxCount += 1
+        elif arr[i][i][n - 1 - i].state == PlayGround.Title.State.default: noneCount += 1
+        if maxCount + noneCount == n:
+            if noneCount < 2: score += priorityWeigh
+            else: score += weigh * maxCount
 
-    maxCount = minCount = noneCount = 0
+    maxCount = noneCount = 0
     for i in range(0, n):
-        if arr[n - 1 - i][i][n - 1 - i].state == maxTitleState: maxCount += 1
-        elif arr[n - 1 - i][i][n - 1 - i].state == minTitleState: minCount += 1
-        else: noneCount += 1
-    totalMaxCount += maxCount * maxCount
-    totalMinCount += minCount * minCount
-    totalNoneCount += noneCount * noneCount
-
-    # maxCount and minCount squared means the more titles in a row the weigher the score is
-    # minus totalNoneCount means the less None Title the weigher the score is
-    score = (math.pow(totalMaxCount, 2) * cfg.heuristicMaxWeigh - math.pow(totalMinCount, 2) * cfg.heuristicMinWeigh - totalNoneCount)
+        if arr[n - 1 - i][i][n - 1 - i].state == scoreState: maxCount += 1
+        elif arr[n - 1 - i][i][n - 1 - i].state == PlayGround.Title.State.default: noneCount += 1
+    if maxCount + noneCount == n:
+        if noneCount < 2: score += priorityWeigh
+        else: score += weigh * maxCount
 
     return score
 
@@ -163,21 +146,19 @@ def Heuristic(title3dArray, minTitleState, maxTitleState):
 # Optimization technique used: Alpha-beta pruning, max depth restriction, heuristic function
 def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, isMax = False, alpha = -math.inf, beta = math.inf,
            maxDepth = cfg.maxDepthSearch, depthWeigh = cfg.depthWeight, heuristicWeigh = cfg.heuristicWeigh):
-    score = 0
-    n = cfg.nTitles
-
     # Evaluation
     if PlayGround.terminalCheck(title3dArray, newestMove) is not None: # Somebody won
-        score = cfg.minmaxEvaluationScore - depth * depthWeigh
-        if title3dArray[newestMove[0]][newestMove[1]][newestMove[2]].state == maxTitleState:
-            return  score
-        else:
-            return -score
+        score = (cfg.minmaxEvaluationScore - depth * depthWeigh) * (-1 if isMax else 1)
+        return score
 
     if depth >= maxDepth:
-        return Heuristic(title3dArray, minTitleState, maxTitleState) * heuristicWeigh
+        heuristicScore = Heuristic(title3dArray, maxTitleState) * cfg.heuristicMaxWeigh - Heuristic(title3dArray, minTitleState) * cfg.heuristicMinWeigh
+        return heuristicScore
 
+    score = 0
+    n = cfg.nTitles
     movecount = 0
+
     if isMax:
         best = -math.inf
         for p in range(0, n):
@@ -203,6 +184,10 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     # Alpha beta pruning
                     if beta <= alpha and cfg.alphabetaPrunning:
                         break
+                else: continue
+                break
+            else: continue
+            break
         score += best
     else:
         best = math.inf
@@ -229,5 +214,10 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
                     # Alpha beta pruning
                     if beta <= alpha and cfg.alphabetaPrunning:
                         break
+                else: continue
+                break
+            else: continue
+            break
         score += best
+
     return score if movecount > 0 else 0

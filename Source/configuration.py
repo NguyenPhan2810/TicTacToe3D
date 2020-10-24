@@ -1,7 +1,7 @@
 import pygame
 
 # Playground
-nTitles = 3 # must be > 1
+nTitles = 4 # must be > 1
 
 titleXThickness = 0.1
 titleOThickness = 0.2
@@ -31,9 +31,10 @@ cameraXRotate = 22
 timePerFrame = 1 / 24
 
 # Min-Max alg
-heuristicMaxWeigh = 1
-heuristicMinWeigh = 1.1
-heuristicWeigh = 5
+heuristicMaxWeigh = 1.1
+heuristicMinWeigh = 1
+heuristicWeigh = 50
+heuristicPriorityWeigh = 500
 maxDepthSearch  = 1
 depthWeight = 1
 minmaxEvaluationScore = 10000
