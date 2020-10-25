@@ -7,11 +7,9 @@ titleXThickness = 0.1
 titleOThickness = 0.2
 titleOSegments = 6
 
-titleWiggleAmount = 0.00
-titleWiggleFrequency = 4
-titleScaleAmount = 0.02
-titleScaleFrequency = 20
-titleSelectedScaleMultiplier = 1.1
+activeTitleColorPulseRate = 20
+activeTitleColorPulseAmount = 100
+selectedTitleScaleMultiplier = 1.1
 
 terminalTitleColorChangeFreq = 5
 terminalTitleColorChangeAmount = 70
@@ -41,8 +39,8 @@ minmaxEvaluationScore = 1000
 alphabetaPruning = True
 
 # MinMaxController
-timeProportionRandomMove = 0.8
-waitingTime = 3
+timeProportionRandomMove = 0.1
+waitingTime = 0
 waitingRandomTimeInterval = 0.5
 
 # Main menu
@@ -67,7 +65,7 @@ if nTitles > len(colorSpace):
 planeColor = rd.sample(colorSpace, nTitles)
 
 backgroundColor = (51, 51, 51)
-activeTitleColor = (5, 2, 3)
+activeTitleColor = (255, 255, 255)
 inactiveTitleColor = (100, 100, 100)
 player1Color = (255, 90, 90)
 player2Color = (100, 90, 255)

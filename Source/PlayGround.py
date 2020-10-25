@@ -95,7 +95,7 @@ class PlayGround(GameObject):
 
         self.selectionCount = 0
         self.activeTitleIndex = None
-        self.activeTitlePreservedTransform = None
+        self.activeTitlePreservedColor = None
 
         self.title3dArray = []
         for i in range(0, n):
@@ -125,17 +125,8 @@ class PlayGround(GameObject):
 
         if self.activeTitleIndex is not None:
             title = self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]]
-            oldTransform = self.activeTitlePreservedTransform
-
-            dx = cfg.titleWiggleAmount * math.cos(self.totalTime * cfg.titleWiggleFrequency)
-            dz = cfg.titleWiggleAmount * math.sin(self.totalTime * cfg.titleWiggleFrequency)
-            ds = cfg.titleScaleAmount * (1 + math.sin(self.totalTime * cfg.titleScaleFrequency))
-            newX = oldTransform.position[0] + dx
-            newZ = oldTransform.position[2] + dz
-            newS = oldTransform.scale + ds
-            title.transform.position[0] = newX
-            title.transform.position[2] = newZ
-            title.transform.scale = newS
+            newColor = np.array(cfg.activeTitleColor) + cfg.activeTitleColorPulseAmount * sin(cfg.activeTitleColorPulseRate * self.totalTime)
+            title.setColor(newColor)
 
         if self.terminalTitles is not None:
             for index in self.terminalTitles:
@@ -160,8 +151,8 @@ class PlayGround(GameObject):
         # Kind of reset if no coordinates are provided
         if index is not None:
             oldTitle = self.title3dArray[index[0]][index[1]][index[2]]
-            oldTitle.transform = self.activeTitlePreservedTransform
-            self.activeTitlePreservedTransform = None
+            oldTitle.setColor(self.activeTitlePreservedColor)
+            self.activeTitlePreservedColor = None
             self.activeTitleIndex = None
 
         if plane is None or row is None or col is None:
@@ -172,7 +163,7 @@ class PlayGround(GameObject):
         newTitle = self.title3dArray[plane][row][col]
         if newTitle.state == Title.State.default:
             self.activeTitleIndex = [plane, row, col]
-            self.activeTitlePreservedTransform = copy.deepcopy(newTitle.transform)
+            self.activeTitlePreservedColor = copy.deepcopy(newTitle.color)
 
     # Return True if selection succeeded false if doesn't
     # Return End game result if there is end game
@@ -185,12 +176,13 @@ class PlayGround(GameObject):
             title.changeState(state)
             self.selectionCount += 1
 
+            result = self.endgameCheck()
+            self.setActiveTitle()
+            title.transform.scale *= cfg.selectedTitleScaleMultiplier
+
             color = cfg.player1Color if state == Title.State.player1 else cfg.player2Color
             title.setColor(color)
 
-            result = self.endgameCheck()
-            self.setActiveTitle()
-            title.transform.scale *= cfg.titleSelectedScaleMultiplier
             if result is not None:
                 return result
             return True
