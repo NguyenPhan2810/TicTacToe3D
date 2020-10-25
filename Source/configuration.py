@@ -49,8 +49,8 @@ waitingRandomTimeInterval = 0.5
 mainmenuTextColor = (255, 255, 255)
 mainmenuTextColorHovered = (235, 124, 165)
 mainmenuTextColorClicked = (255, 144, 205)
-
-
+guideScrollAmount = 30
+guideImageFilename = "Resources/Images/guide.png"
 
 # Colors
 import random as rd

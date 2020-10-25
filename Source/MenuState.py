@@ -19,6 +19,9 @@ class MenuState(BaseState):
         self.playState = None
         self.selfDestroy = False
 
+        self.guideImage = None
+        self.guideImagePos = [0, 0]
+
     def constructor(self):
         BaseState.constructor(self)
         self.screen = pygame.display.set_mode(cfg.displaySize)
@@ -40,6 +43,10 @@ class MenuState(BaseState):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.activeButtons = self.mainButtons
+                    self.guideImage = None
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4: self.guideImagePos[1] += cfg.guideScrollAmount
+                elif event.button == 5: self.guideImagePos[1] -= cfg.guideScrollAmount
 
         for button in self.activeButtons:
             button.eventHandling(events)
@@ -52,6 +59,10 @@ class MenuState(BaseState):
         for button in self.activeButtons:
             button.update(deltaTime)
 
+        if self.guideImage:
+            self.guideImagePos[1] = min(0, self.guideImagePos[1])
+            self.guideImagePos[1] = max(cfg.displaySize[1] - self.guideImage.get_size()[1], self.guideImagePos[1])
+
         if self.playState is not None:
             return False
 
@@ -61,6 +72,9 @@ class MenuState(BaseState):
         BaseState.render(self)
 
         self.screen.fill(cfg.backgroundColor)
+
+        if self.guideImage:
+            self.screen.blit(self.guideImage, self.guideImagePos)
 
         for button in self.activeButtons:
             button.draw()
@@ -102,7 +116,11 @@ class MenuState(BaseState):
         self.activeButtons = self.selectModeButtons
 
     def guideCallback(self):
-        print("Guide")
+        self.activeButtons = []
+
+        image = pygame.image.load(cfg.guideImageFilename)
+        self.guideImage = image
+
 
     def exitCallback(self):
         self.selfDestroy = True
