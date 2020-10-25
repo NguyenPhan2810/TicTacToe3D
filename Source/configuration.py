@@ -33,15 +33,13 @@ heuristicMaxWeigh = 1
 heuristicMinWeigh = 1
 heuristicWeigh = 5
 heuristicPriorityWeigh = 100
-maxDepthSearch  = 1
+maxDepthSearch  = 2
 depthWeight = 1
 minmaxEvaluationScore = 1000
 alphabetaPruning = True
 
 # MinMaxController
-timeProportionRandomMove = 0.1
-waitingTime = 0
-waitingRandomTimeInterval = 0.5
+waitingTime = 5
 
 # Main menu
 mainmenuTextColor = (255, 255, 255)

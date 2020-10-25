@@ -100,14 +100,14 @@ class MinMaxController(Controller):
         GameObject.__init__(self)
         self.isStartCalculating = False
         self.findBestMoveProcess = None
+        self.bestMoveQueue = multiprocessing.Queue()
+        self.calculatingMoveQueue = multiprocessing.Queue()
         self.availableTitle = None
 
         self.isSelectTitle = False
         self.timeTaken = 0.0
         self.maxTimeWait = cfg.waitingTime
         self.isCalculating = False
-        self.randomTimeWait = 0
-        self.maxRandomTimeInterval = cfg.waitingRandomTimeInterval
 
         self.maxDepth = maxDepthSearch
         self.depthWeigh = depthWeight
@@ -115,7 +115,7 @@ class MinMaxController(Controller):
         self.evaluationScore = evaluationScore
 
         self.bestMove = None
-        self.currentRandomMove = None
+        self.calculatingMove = None
 
     def reset(self):
         Controller.reset(self)
@@ -123,15 +123,14 @@ class MinMaxController(Controller):
         self.isStartCalculating = False
         self.findBestMoveProcess = None
         self.bestMoveQueue = multiprocessing.Queue()
+        self.calculatingMoveQueue = multiprocessing.Queue()
         self.availableTitle = None
 
         self.isSelectTitle = False
         self.timeTaken = 0.0
         self.isCalculating = False
-        self.randomTimeWait = 0
 
         self.bestMove = None
-        self.currentRandomMove = None
 
     def destructor(self):
         if self.findBestMoveProcess is not None:
@@ -145,7 +144,7 @@ class MinMaxController(Controller):
             if  self.bestMove is None:
                 print(self, " Started finding move")
                 self.findBestMoveProcess = multiprocessing.Process(target=self.findBestMove,
-                                                                   args=(title3dArray, gameState, self.bestMoveQueue),
+                                                                   args=(title3dArray, gameState, self.bestMoveQueue, self.calculatingMoveQueue),
                                                                    daemon=True)
                 self.findBestMoveProcess.start()
         elif not self.findBestMoveProcess.is_alive():
@@ -158,9 +157,14 @@ class MinMaxController(Controller):
             self.isStartCalculating = True
             self.timeTaken = 0.0
 
-        if self.timeTaken < self.maxTimeWait * cfg.timeProportionRandomMove or self.isCalculating:
-            self.getRandomMove()
-            return self.currentRandomMove
+        if self.isCalculating:
+            try:
+                calMove = self.calculatingMoveQueue.get_nowait()
+                if calMove:
+                    self.calculatingMove = calMove
+                    return calMove
+            except:
+                return self.calculatingMove
 
         return self.bestMove
 
@@ -175,7 +179,9 @@ class MinMaxController(Controller):
             return True
         return False
 
-    def findBestMove(self, title3dArray, gameState, queue):
+    def findBestMove(self, title3dArray, gameState,
+                     queue: multiprocessing.Queue,
+                     calculatingQueue: multiprocessing.Queue):
         print("Started finding move")
         timeStart = time.time()
 
@@ -208,7 +214,9 @@ class MinMaxController(Controller):
             if moveEvaluation > bestEvaluation:
                 bestEvaluation = moveEvaluation
                 bestMoves = [[p, r, c]]
+                calculatingQueue.put([p, r, c])
             elif moveEvaluation == bestEvaluation:
+                calculatingQueue.put([p, r, c])
                 bestMoves += [[p, r, c]]
 
         queue.put(rd.choice(bestMoves))
@@ -229,18 +237,10 @@ class MinMaxController(Controller):
 
                     self.availableTitle += [[p, r, c]]
 
-    def getRandomMove(self):
-        if self.randomTimeWait < self.maxRandomTimeInterval:
-            return self.currentRandomMove
-
-        self.randomTimeWait = 0
-        self.currentRandomMove = rd.choice(self.availableTitle)
-
     def update(self, deltaTime: float):
         Controller.update(self, deltaTime)
 
         self.timeTaken += deltaTime
-        self.randomTimeWait += deltaTime
 
         if self.timeTaken > self.maxTimeWait and not self.isSelectTitle and self.isStartCalculating:
             self.isSelectTitle = True
