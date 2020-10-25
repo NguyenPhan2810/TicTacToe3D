@@ -33,12 +33,15 @@ class MenuState(BaseState):
 
         human = HumanController()
         minmax = MinMaxController()
-        pvp.playState = PlayState.PlayState(human, human)
-        pvm.playState = PlayState.PlayState(human, minmax)
-        mvp.playState = PlayState.PlayState(minmax, human)
-        mvm.playState = PlayState.PlayState(minmax, minmax)
+        pvp.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(human, human),))
+        pvm.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(human, minmax),))
+        mvp.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(minmax, human),))
+        mvm.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(minmax, minmax),))
 
         self.buttons = [pvp, pvm, mvp, mvm]
+
+    def buttonClickedCallback(self, playstate):
+        self.playState = playstate
 
     def requestPushState(self):
         return self.playState
@@ -64,8 +67,6 @@ class MenuState(BaseState):
 
         for button in self.buttons:
             button.update(deltaTime)
-            if button.isClicked:
-                self.playState = button.playState
 
         if self.playState is not None:
             return False
@@ -100,7 +101,12 @@ class Button:
         self.isClicked = False
         self.isHovered = False
 
-        self.playState = None
+        self.onClickedCallback = None
+        self.onClickedArgs = tuple()
+
+    def setOnClickedCallback(self, target, args = tuple()):
+        self.onClickedCallback = target
+        self.onClickedArgs = args
 
     def eventHandling(self, events):
         self.isClicked = False
@@ -118,6 +124,8 @@ class Button:
                     self.text = self.textClicked
             if event.type == pygame.MOUSEBUTTONUP:
                 self.isClicked = self.isHovered
+                if self.isClicked and self.onClickedCallback:
+                    self.onClickedCallback(*self.onClickedArgs)
 
     def update(self, deltaTime: float):
         pass
