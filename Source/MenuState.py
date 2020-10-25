@@ -12,7 +12,9 @@ class MenuState(BaseState):
         BaseState.__init__(self)
         self.font = None
         self.text = None
-        self.buttons = None
+        self.activeButtons = None
+        self.mainButtons = None
+        self.selectModeButtons = None
 
         self.playState = None
         self.selfDestroy = False
@@ -22,6 +24,49 @@ class MenuState(BaseState):
         self.screen = pygame.display.set_mode(cfg.displaySize)
 
         self.constructButtons()
+
+        self.activeButtons = self.mainButtons
+
+    def requestPushState(self):
+        return self.playState
+
+    def requestPopState(self):
+        return self.selfDestroy
+
+    def eventHandling(self, events) -> bool:
+        BaseState.eventHandling(self, events)
+
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.activeButtons = self.mainButtons
+
+        for button in self.activeButtons:
+            button.eventHandling(events)
+
+        return False
+
+    def update(self, deltaTime: float) -> bool:
+        BaseState.update(self, deltaTime)
+
+        for button in self.activeButtons:
+            button.update(deltaTime)
+
+        if self.playState is not None:
+            return False
+
+        return True
+
+    def render(self) -> bool:
+        BaseState.render(self)
+
+        self.screen.fill(cfg.backgroundColor)
+
+        for button in self.activeButtons:
+            button.draw()
+
+        pygame.display.update()
+        return False
 
     def constructButtons(self):
         posX = cfg.displaySize[0] / 2
@@ -38,51 +83,29 @@ class MenuState(BaseState):
         mvp.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(minmax, human),))
         mvm.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(minmax, minmax),))
 
-        self.buttons = [pvp, pvm, mvp, mvm]
+        self.selectModeButtons = [pvp, pvm, mvp, mvm]
+
+        play = Button(self.screen, "Play", (posX, posY - 100), 60)
+        guide = Button(self.screen, "Guide", (posX, posY), 60)
+        exit = Button(self.screen, "Exit", (posX, posY + 100), 60)
+
+        play.setOnClickedCallback(target=self.playCallback)
+        guide.setOnClickedCallback(target=self.guideCallback)
+        exit.setOnClickedCallback(target=self.exitCallback)
+
+        self.mainButtons = [play, guide, exit]
 
     def buttonClickedCallback(self, playstate):
         self.playState = playstate
 
-    def requestPushState(self):
-        return self.playState
+    def playCallback(self):
+        self.activeButtons = self.selectModeButtons
 
-    def requestPopState(self):
-        return self.selfDestroy
+    def guideCallback(self):
+        print("Guide")
 
-    def eventHandling(self, events) -> bool:
-        BaseState.eventHandling(self, events)
-
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.selfDestroy = True
-
-        for button in self.buttons:
-            button.eventHandling(events)
-
-        return False
-
-    def update(self, deltaTime: float) -> bool:
-        BaseState.update(self, deltaTime)
-
-        for button in self.buttons:
-            button.update(deltaTime)
-
-        if self.playState is not None:
-            return False
-
-        return True
-
-    def render(self) -> bool:
-        BaseState.render(self)
-
-        self.screen.fill(cfg.backgroundColor)
-
-        for button in self.buttons:
-            button.draw()
-
-        pygame.display.update()
-        return False
+    def exitCallback(self):
+        self.selfDestroy = True
 
 class Button:
     def __init__(self, screen, text, pos, fontSize,
