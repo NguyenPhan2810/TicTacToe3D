@@ -7,6 +7,7 @@ class BaseState:
 
     # Return False means no event will pass to the lower state
     def eventHandling(self, events) -> bool:
+        print("Event handled")
         return True
 
     # Return True means to pop the state
@@ -17,13 +18,12 @@ class BaseState:
     def requestPushState(self):
         return None
 
-    # Return False means to end the state
+    # Return False means not to update the lower state
     def update(self, deltaTime: float) -> bool:
         return True
 
     def lateUpdate(self, deltaTime: float):
         pass
 
-    # Return False means not to render the lower state
-    def render(self) -> bool:
-        return True
+    def render(self):
+        pass

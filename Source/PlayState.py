@@ -28,7 +28,6 @@ class PlayState(BaseState):
         self.mouseHold = False
 
     def constructor(self):
-        BaseState.constructor(self)
         self.objectRoot.constructor()
 
         pygame.display.set_mode(cfg.displaySize, DOUBLEBUF | OPENGL)
@@ -55,8 +54,6 @@ class PlayState(BaseState):
         self.exit = False
 
     def eventHandling(self, events):
-        BaseState.eventHandling(self, events)
-
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -78,7 +75,6 @@ class PlayState(BaseState):
         if self.exit:
             from MenuState import MenuState
             self.pushState = MenuState()
-            return False
 
         # Update object tree
         BaseState.update(self, deltaTime)
@@ -102,8 +98,6 @@ class PlayState(BaseState):
         return True
 
     def lateUpdate(self, deltaTime: float):
-        BaseState.lateUpdate(self, deltaTime)
-
         self.objectRoot.lateUpdate(deltaTime)
 
     def render(self):
@@ -116,8 +110,6 @@ class PlayState(BaseState):
 
         # Display
         pygame.display.flip()
-
-        return False
 
     def isGameOver(self):
         return self.state == GameStatus.gameOver
@@ -150,6 +142,9 @@ class PlayState(BaseState):
 
     def requestPushState(self):
         return self.pushState
+
+    def requestPopState(self):
+        return self.exit
 
     def updatePicking(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)

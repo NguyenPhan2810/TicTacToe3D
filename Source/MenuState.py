@@ -9,78 +9,124 @@ from Controller import HumanController, MinMaxController
 
 class MenuState(BaseState):
     def __init__(self):
-        BaseState.__init__(self)
-        self.font = None
-        self.text = None
-        self.activeButtons = None
-        self.mainButtons = None
-        self.selectModeButtons = None
+        super().__init__()
+        self.screen = None
+        self.buttons = None
 
-        self.playState = None
+        self.pushState = None
         self.selfDestroy = False
 
-        self.guideImage = None
-        self.guideImagePos = [0, 0]
-
     def constructor(self):
-        BaseState.constructor(self)
-        self.screen = pygame.display.set_mode(cfg.displaySize)
-
+        self.screen =  pygame.display.set_mode(cfg.displaySize)
         self.constructButtons()
 
-        self.activeButtons = self.mainButtons
-
     def requestPushState(self):
-        return self.playState
+        pushState = self.pushState
+        self.pushState = None
+        return pushState
 
     def requestPopState(self):
         return self.selfDestroy
 
     def eventHandling(self, events) -> bool:
-        BaseState.eventHandling(self, events)
-
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.activeButtons = self.mainButtons
-                    self.guideImage = None
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 4: self.guideImagePos[1] += cfg.guideScrollAmount
-                elif event.button == 5: self.guideImagePos[1] -= cfg.guideScrollAmount
+                    self.selfDestroy = True
 
-        for button in self.activeButtons:
+        for button in self.buttons:
             button.eventHandling(events)
 
         return False
 
     def update(self, deltaTime: float) -> bool:
-        BaseState.update(self, deltaTime)
-
-        for button in self.activeButtons:
+        for button in self.buttons:
             button.update(deltaTime)
 
-        if self.guideImage:
-            self.guideImagePos[1] = min(0, self.guideImagePos[1])
-            self.guideImagePos[1] = max(cfg.displaySize[1] - self.guideImage.get_size()[1], self.guideImagePos[1])
+        return False
 
-        if self.playState is not None:
-            return False
-
-        return True
-
-    def render(self) -> bool:
-        BaseState.render(self)
-
+    def render(self):
         self.screen.fill(cfg.backgroundColor)
 
-        if self.guideImage:
-            self.screen.blit(self.guideImage, self.guideImagePos)
-
-        for button in self.activeButtons:
+        for button in self.buttons:
             button.draw()
 
         pygame.display.update()
+
+    def constructButtons(self):
+        posX = cfg.displaySize[0] / 2
+        posY = cfg.displaySize[1] / 2
+        play = Button(self.screen, "Play", (posX, posY - 100), 60)
+        guide = Button(self.screen, "Guide", (posX, posY), 60)
+        exit = Button(self.screen, "Exit", (posX, posY + 100), 60)
+
+        play.setOnClickedCallback(target=self.playCallback)
+        guide.setOnClickedCallback(target=self.guideCallback)
+        exit.setOnClickedCallback(target=self.exitCallback)
+
+        self.buttons = [play, guide, exit]
+
+    def buttonClickedCallback(self, playstate):
+        self.playState = playstate
+        self.pushState = self.playState
+
+    def playCallback(self):
+        self.pushState = ModeSelectionState()
+        self.selfDestroy = True
+
+    def guideCallback(self):
+        self.pushState = GuideState()
+
+    def exitCallback(self):
+        self.selfDestroy = True
+
+class ModeSelectionState(BaseState):
+    def __init__(self):
+        super().__init__()
+        self.screen = None
+        self.buttons = None
+
+        self.playState = None
+        self.pushState = None
+        self.selfDestroy = False
+
+    def constructor(self):
+        self.screen =  pygame.display.set_mode(cfg.displaySize)
+        self.constructButtons()
+
+    def requestPushState(self):
+        pushState = self.pushState
+        self.pushState = None
+        return pushState
+
+    def requestPopState(self):
+        return self.selfDestroy
+
+    def eventHandling(self, events) -> bool:
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.selfDestroy = True
+                    self.pushState = MenuState()
+
+        for button in self.buttons:
+            button.eventHandling(events)
+
         return False
+
+    def update(self, deltaTime: float) -> bool:
+        for button in self.buttons:
+            button.update(deltaTime)
+
+        return False
+
+    def render(self):
+        self.screen.fill(cfg.backgroundColor)
+
+        for button in self.buttons:
+            button.draw()
+
+        pygame.display.update()
 
     def constructButtons(self):
         posX = cfg.displaySize[0] / 2
@@ -97,33 +143,59 @@ class MenuState(BaseState):
         mvp.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(minmax, human),))
         mvm.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(minmax, minmax),))
 
-        self.selectModeButtons = [pvp, pvm, mvp, mvm]
+        self.buttons = [pvp, pvm, mvp, mvm]
 
-        play = Button(self.screen, "Play", (posX, posY - 100), 60)
-        guide = Button(self.screen, "Guide", (posX, posY), 60)
-        exit = Button(self.screen, "Exit", (posX, posY + 100), 60)
-
-        play.setOnClickedCallback(target=self.playCallback)
-        guide.setOnClickedCallback(target=self.guideCallback)
-        exit.setOnClickedCallback(target=self.exitCallback)
-
-        self.mainButtons = [play, guide, exit]
 
     def buttonClickedCallback(self, playstate):
         self.playState = playstate
-
-    def playCallback(self):
-        self.activeButtons = self.selectModeButtons
-
-    def guideCallback(self):
-        self.activeButtons = []
-
-        image = pygame.image.load(cfg.guideImageFilename)
-        self.guideImage = image
-
-
-    def exitCallback(self):
+        self.pushState = self.playState
         self.selfDestroy = True
+
+class GuideState(BaseState):
+    def __init__(self):
+        super().__init__()
+        self.screen = None
+        self.playState = None
+        self.selfDestroy = False
+
+        self.guideImage = None
+        self.guideImagePos = [0, 0]
+
+    def constructor(self):
+        self.screen = pygame.display.set_mode(cfg.displaySize)
+        self.guideImage = pygame.image.load(cfg.guideImageFilename)
+
+    def requestPushState(self):
+        return None
+
+    def requestPopState(self):
+        return self.selfDestroy
+
+    def eventHandling(self, events) -> bool:
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.selfDestroy = True
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4: self.guideImagePos[1] += cfg.guideScrollAmount
+                elif event.button == 5: self.guideImagePos[1] -= cfg.guideScrollAmount
+
+        return False
+
+    def update(self, deltaTime: float) -> bool:
+        if self.guideImage:
+            self.guideImagePos[1] = min(0, self.guideImagePos[1])
+            self.guideImagePos[1] = max(cfg.displaySize[1] - self.guideImage.get_size()[1], self.guideImagePos[1])
+
+        return False
+
+    def render(self):
+        self.screen.fill(cfg.backgroundColor)
+
+        if self.guideImage:
+            self.screen.blit(self.guideImage, self.guideImagePos)
+
+        pygame.display.update()
 
 class Button:
     def __init__(self, screen, text, pos, fontSize,
@@ -161,12 +233,13 @@ class Button:
                 else:
                     self.text = self.textNormal
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if self.isHovered:
+                if self.isHovered and event.button == 1:
                     self.text = self.textClicked
             if event.type == pygame.MOUSEBUTTONUP:
-                self.isClicked = self.isHovered
-                if self.isClicked and self.onClickedCallback:
-                    self.onClickedCallback(*self.onClickedArgs)
+                if event.button == 1:
+                    self.isClicked = self.isHovered
+                    if self.isClicked and self.onClickedCallback:
+                        self.onClickedCallback(*self.onClickedArgs)
 
     def update(self, deltaTime: float):
         pass

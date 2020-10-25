@@ -49,12 +49,18 @@ class Game:
                 break
 
     def popState(self, index = 0):
+        if len(self.statesStack) == 0:
+            return None
+
         state = self.statesStack.pop(index)
         state.destructor()
         self.statesStackChanged = True
         return state
 
     def pushState(self, state):
+        if state is None:
+            return
+
         state.constructor()
         self.statesStack.insert(0, state)
         self.statesStackchanged = True
@@ -63,11 +69,7 @@ class Game:
         stackSize = len(self.statesStack)
         for i in range(0, stackSize):
             state = self.statesStack[i]
-            if not state.update(deltaTime):
-                self.popState(i)
-                i -= 1
-                stackSize -= 1
-
+            updateLowerState = state.update(deltaTime)
             state.lateUpdate(deltaTime)
 
             if state.requestPopState():
@@ -77,10 +79,12 @@ class Game:
             if pushState is not None:
                 self.pushState(pushState)
 
+            if not updateLowerState:
+                break
+
         if len(self.statesStack) == 0:
             self.isGameRunning = False
 
     def render(self):
-        for i in range(len(self.statesStack) - 1, -1, -1):
-            if not self.statesStack[i].render():
-                break
+        if len(self.statesStack) != 0:
+            self.statesStack[0].render()
