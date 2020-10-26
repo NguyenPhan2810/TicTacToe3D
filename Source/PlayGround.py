@@ -83,7 +83,6 @@ class PlayGround(GameObject):
         self.totalTime = 0.0
 
         self.planes = []
-        self.transform.scale = cfg.playGroundScale
 
         n = cfg.nTitles
         for y in np.arange(-0.5, 0.51, 1.0 / (n - 1)):  # Make planes center to 0

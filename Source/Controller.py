@@ -48,9 +48,11 @@ class HumanController(Controller):
         n = cfg.nTitles
         for event in pygameEvents:
             if event.type == pygame.MOUSEBUTTONDOWN:
-                self.isMouseMoved = False
+                if event.button == 1:
+                    self.isMouseMoved = False
             elif event.type == pygame.MOUSEBUTTONUP:
-                self.isMouseUp = True
+                if event.button == 1:
+                    self.isMouseUp = True
             elif event.type == pygame.MOUSEMOTION:
                 self.isMouseMoved = True
 

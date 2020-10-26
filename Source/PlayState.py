@@ -61,10 +61,16 @@ class PlayState(BaseState):
                 if event.key == pygame.K_ESCAPE:
                     self.exit = True
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                pygame.mouse.get_rel()
-                self.mouseHold = True
+                if event.button == 1:
+                    pygame.mouse.get_rel()
+                    self.mouseHold = True
+                elif event.button == 4:
+                    self.playGround.transform.scale *= cfg.playGroundZoomAmount
+                elif event.button == 5:
+                    self.playGround.transform.scale /= cfg.playGroundZoomAmount
             elif event.type == pygame.MOUSEBUTTONUP:
-                self.mouseHold = False
+                if event.button == 1:
+                    self.mouseHold = False
 
         self.objectRoot.event(events)
 

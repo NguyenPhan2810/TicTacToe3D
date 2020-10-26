@@ -1,7 +1,7 @@
 import pygame
 
 # Playground
-nTitles = 4 # must be > 1
+nTitles = 3 # must be > 1
 
 titleXThickness = 0.1
 titleOThickness = 0.2
@@ -14,7 +14,7 @@ selectedTitleScaleMultiplier = 1.1
 terminalTitleColorChangeFreq = 5
 terminalTitleColorChangeAmount = 70
 
-playGroundScale = [1, 1, 1]
+playGroundZoomAmount = 1.2
 mouseRotationSensitivity = 0.3
 titlesPadding = 1
 
@@ -33,10 +33,10 @@ heuristicMaxWeigh = 1
 heuristicMinWeigh = 1
 heuristicWeigh = 5
 heuristicPriorityWeigh = 100
-maxDepthSearch  = 2
+maxDepthSearch  = 1
 depthWeight = 1
 minmaxEvaluationScore = 1000
-alphabetaPruning = False
+alphabetaPruning = True
 
 # MinMaxController
 waitingTime = 4
