@@ -2,6 +2,7 @@ import numpy as np
 from math import *
 from OpenGL.GL import *
 import GLShapes
+import copy
 
 class Transform:
     def __init__(self):
@@ -17,6 +18,7 @@ class GameObject:
     def __init__(self):
         self.transform = Transform()
         self.globalTransform = Transform()
+        self.prevGlobalTransform = Transform()
         self.meshData = None
         self.transformedVertices = None
 
@@ -60,10 +62,11 @@ class GameObject:
             self.updateRotation()
 
     def lateUpdate(self, deltaTime: float):
+        print(deltaTime)
         for child in self.children:
             child.lateUpdate(deltaTime)
 
-        if self.meshData is not None:
+        if self.meshData is not None and self.prevGlobalTransform != self.globalTransform:
             self.transformedVertices = self.glCalculateTransform(self.meshData.vertices)
 
     def draw(self):
@@ -94,6 +97,7 @@ class GameObject:
 
     def updateTransform(self):
         if self.parent is not None:
+            self.prevGlobalTransform = copy.deepcopy(self.globalTransform)
             self.globalTransform.scale = self.parent.globalTransform.scale * self.transform.scale
             self.globalTransform.position = (self.parent.globalTransform.position + self.transform.position * self.parent.globalTransform.scale)
             self.globalTransform.rotation = self.parent.globalTransform.rotation + self.transform.rotation
@@ -126,13 +130,14 @@ class GameObject:
         if self.transformedVertices is None:
             return
 
+        vertexRange = range(4)
+        colorArray = self.meshData.surfaceColors / 255
+
         glBegin(GL_QUADS)
-        surfaceIndex = 0
-        for surface in self.meshData.surfaces:
-            glColor3fv(np.array(self.meshData.surfaceColors[surfaceIndex]) / 255)
-            surfaceIndex += 1
-            for vertex in surface:
-                glVertex3fv(self.transformedVertices[vertex])
+        for surface in range(len(self.meshData.surfaces)):
+            glColor3fv(colorArray[surface])
+            for vertex in vertexRange:
+                glVertex3fv(self.transformedVertices[self.meshData.surfaces[surface][vertex]])
         glEnd()
 
     def idToColor(self):
@@ -144,12 +149,12 @@ class GameObject:
     def glDrawPicking(self):
         if self.transformedVertices is None:
             return
-
-        glBegin(GL_QUADS)
         glColor3fv(np.array(self.idToColor()) / 255)
-        for surface in self.meshData.surfaces:
-            for vertex in surface:
-                glVertex3fv(self.transformedVertices[vertex])
+        vertexRange = range(4)
+        glBegin(GL_QUADS)
+        for surface in range(len(self.meshData.surfaces)):
+            for vertex in vertexRange:
+                glVertex3fv(self.transformedVertices[self.meshData.surfaces[surface][vertex]])
         glEnd()
 
     def move(self, direction):

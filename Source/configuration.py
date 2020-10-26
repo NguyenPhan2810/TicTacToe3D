@@ -26,20 +26,20 @@ nearClippingPlane = 0.1
 farClippingPlane = 50.0
 cameraZOffset = -7
 cameraXRotate = 22
-timePerFrame = 1 / 24
+timePerFrame = 1 / 60
 
 # Min-Max alg
 heuristicMaxWeigh = 1
 heuristicMinWeigh = 1
 heuristicWeigh = 5
 heuristicPriorityWeigh = 100
-maxDepthSearch  = 2
+maxDepthSearch  = 1
 depthWeight = 1
 minmaxEvaluationScore = 1000
 alphabetaPruning = True
 
 # MinMaxController
-waitingTime = 5
+waitingTime = 4
 
 # Main menu
 mainmenuTextColor = (255, 255, 255)

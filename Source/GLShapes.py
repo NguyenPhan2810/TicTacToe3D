@@ -17,7 +17,7 @@ class GLShape():
         self.setColor(color)
 
     def setColor(self, color):
-        self.surfaceColors = [copy.deepcopy(color) for i in range(len(self.surfaces))]
+        self.surfaceColors = np.array([copy.deepcopy(color) for i in range(len(self.surfaces))])
 
 class Cube(GLShape):
     vertices = [
