@@ -62,7 +62,6 @@ class GameObject:
             self.updateRotation()
 
     def lateUpdate(self, deltaTime: float):
-        print(deltaTime)
         for child in self.children:
             child.lateUpdate(deltaTime)
 

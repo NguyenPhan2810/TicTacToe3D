@@ -26,7 +26,7 @@ nearClippingPlane = 0.1
 farClippingPlane = 50.0
 cameraZOffset = -7
 cameraXRotate = 22
-timePerFrame = 1 / 60
+timePerFrame = 1 / 30
 
 # Min-Max alg
 heuristicMaxWeigh = 1
