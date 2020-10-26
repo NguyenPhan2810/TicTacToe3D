@@ -157,6 +157,7 @@ class GuideState(BaseState):
         self.screen = None
         self.playState = None
         self.selfDestroy = False
+        self.mouseHold = False
 
         self.guideImage = None
         self.guideImagePos = [0, 0]
@@ -179,13 +180,20 @@ class GuideState(BaseState):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 4: self.guideImagePos[1] += cfg.guideScrollAmount
                 elif event.button == 5: self.guideImagePos[1] -= cfg.guideScrollAmount
+                elif event.button == 1:
+                    self.mouseHold = True
+                    pygame.mouse.get_rel()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1: self.mouseHold = False
 
         return False
 
     def update(self, deltaTime: float) -> bool:
-        if self.guideImage:
-            self.guideImagePos[1] = min(0, self.guideImagePos[1])
-            self.guideImagePos[1] = max(cfg.displaySize[1] - self.guideImage.get_size()[1], self.guideImagePos[1])
+        if self.mouseHold:
+            self.guideImagePos[1] += pygame.mouse.get_rel()[1]
+
+        self.guideImagePos[1] = min(0, self.guideImagePos[1])
+        self.guideImagePos[1] = max(cfg.displaySize[1] - self.guideImage.get_size()[1], self.guideImagePos[1])
 
         return False
 
