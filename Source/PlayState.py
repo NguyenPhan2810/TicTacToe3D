@@ -98,8 +98,9 @@ class PlayState(BaseState):
             self.playgroundRotationX += rotationX
             if -cfg.playGroundMaxRotationX <= self.playgroundRotationX <= cfg.playGroundMaxRotationX:
                 glRotatef(rotationX, 1, 0, 0)
-            self.playgroundRotationX = max(self.playgroundRotationX, -cfg.playGroundMaxRotationX)
-            self.playgroundRotationX = min(self.playgroundRotationX, cfg.playGroundMaxRotationX)
+            else:
+                self.playgroundRotationX -= rotationX
+            print(self.playgroundRotationX)
             self.playGround.transform.rotation[1] -= rotationY
 
         # Check picking
