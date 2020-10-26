@@ -1,7 +1,7 @@
 import pygame
 
 # Playground
-nTitles = 3 # must be > 1
+nTitles = 4 # must be > 1
 
 titleXThickness = 0.1
 titleOThickness = 0.2
@@ -45,7 +45,7 @@ waitingTime = 4
 mainmenuTextColor = (255, 255, 255)
 mainmenuTextColorHovered = (235, 124, 165)
 mainmenuTextColorClicked = (255, 144, 205)
-guideScrollAmount = 30
+guideScrollAmount = 40
 guideImageFilename = "Resources/Images/guide.png"
 
 # Colors
