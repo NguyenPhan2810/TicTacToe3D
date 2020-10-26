@@ -148,12 +148,10 @@ def MinMax(title3dArray, newestMove, minTitleState, maxTitleState, depth = 0, is
            maxDepth = cfg.maxDepthSearch, depthWeigh = cfg.depthWeight, heuristicWeigh = cfg.heuristicWeigh):
     # Evaluation
     if PlayGround.terminalCheck(title3dArray, newestMove) is not None: # Somebody won
-        score = (cfg.minmaxEvaluationScore - depth * depthWeigh) * (-1 if isMax else 1)
-        return score
+        return (cfg.minmaxEvaluationScore - depth * depthWeigh) * (-1 if isMax else 1)
 
     if depth >= maxDepth:
-        heuristicScore = Heuristic(title3dArray, maxTitleState) * cfg.heuristicMaxWeigh - Heuristic(title3dArray, minTitleState) * cfg.heuristicMinWeigh
-        return heuristicScore
+        return Heuristic(title3dArray, maxTitleState) - Heuristic(title3dArray, minTitleState)
 
     score = 0
     n = cfg.nTitles
