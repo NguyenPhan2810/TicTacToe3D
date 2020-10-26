@@ -102,11 +102,7 @@ class MinMaxController(Controller):
         self.findBestMoveProcess = None
         self.bestMoveQueue = multiprocessing.Queue()
         self.calculatingMoveQueue = multiprocessing.Queue()
-        self.parameterQueue = multiprocessing.Queue()
         self.availableTitle = None
-
-        self.title3dArray = None
-        self.gameState = None
 
         self.isSelectTitle = False
         self.timeTaken = 0.0
@@ -128,7 +124,6 @@ class MinMaxController(Controller):
         self.findBestMoveProcess = None
         self.bestMoveQueue = multiprocessing.Queue()
         self.calculatingMoveQueue = multiprocessing.Queue()
-        self.parameterQueue = multiprocessing.Queue()
         self.availableTitle = None
 
         self.isSelectTitle = False
@@ -141,31 +136,26 @@ class MinMaxController(Controller):
         if self.findBestMoveProcess is not None:
             self.findBestMoveProcess.terminate()
 
-    def constructor(self):
-        self.findBestMoveProcess = multiprocessing.Process(target=self.findBestMove,
-                                                           args=(self.parameterQueue, self.bestMoveQueue, self.calculatingMoveQueue),
-                                                           daemon=True)
-        self.findBestMoveProcess.start()
-
     def activeTitle(self, title3dArray, gameState):
-        self.title3dArray = title3dArray
-        self.gameState = gameState
-
         if self.availableTitle is None:
             self.prepareAvailableMove(title3dArray)
 
-        try:
-            self.bestMove = self.bestMoveQueue.get_nowait()
-        except:
-            self.bestMove = None
-
+        if self.findBestMoveProcess is None:
+            if  self.bestMove is None:
+                print(self, " Started finding move")
+                self.findBestMoveProcess = multiprocessing.Process(target=self.findBestMove,
+                                                                   args=(title3dArray, gameState, self.bestMoveQueue, self.calculatingMoveQueue),
+                                                                   daemon=True)
+                self.findBestMoveProcess.start()
+        elif not self.findBestMoveProcess.is_alive():
+            self.bestMove = self.bestMoveQueue.get()
+            self.findBestMoveProcess = None
+            
         self.isCalculating = self.bestMove is None
 
         if not self.isStartCalculating and self.isCalculating and not self.isSelectTitle:
             self.isStartCalculating = True
             self.timeTaken = 0.0
-
-            self.parameterQueue.put(True)
 
         if self.isCalculating:
             try:
@@ -189,56 +179,51 @@ class MinMaxController(Controller):
             return True
         return False
 
-    def findBestMove(self, parameterQueue: multiprocessing.Queue,
-                     bestMoveQueue: multiprocessing.Queue,
+    def findBestMove(self, title3dArray, gameState,
+                     queue: multiprocessing.Queue,
                      calculatingQueue: multiprocessing.Queue):
-        print(bestMoveQueue.get())
-        while parameterQueue.get():
-            title3dArray = self.title3dArray
-            gameState = self.gameState
+        print("Started finding move")
+        timeStart = time.time()
 
-            print("Started finding move")
-            timeStart = time.time()
+        bestEvaluation = -math.inf
+        n = cfg.nTitles
 
-            bestEvaluation = -math.inf
-            n = cfg.nTitles
+        playerTitleState = oponentTitleState = Title.State.default
+        if gameState == gameState.player1:
+            playerTitleState = Title.State.player1
+            oponentTitleState = Title.State.player2
+        else:
+            playerTitleState = Title.State.player2
+            oponentTitleState = Title.State.player1
 
-            playerTitleState = oponentTitleState = Title.State.default
-            if gameState == gameState.player1:
-                playerTitleState = Title.State.player1
-                oponentTitleState = Title.State.player2
-            else:
-                playerTitleState = Title.State.player2
-                oponentTitleState = Title.State.player1
+        # Traverse through all possible move
+        bestMoves = []
+        for p, r, c in self.availableTitle:
+            title = title3dArray[p][r][c]
+            preserveState = copy.copy(title.state)
+            title.state = playerTitleState
+            moveEvaluation = MinMax(title3dArray, (p, r, c),
+                                    minTitleState=oponentTitleState,
+                                    maxTitleState=playerTitleState,
+                                    isMax=False,
+                                    maxDepth=self.maxDepth,
+                                    depthWeigh=self.depthWeigh,
+                                    heuristicWeigh=self.heuristicWeigh)
+            title.state = preserveState
 
-            # Traverse through all possible move
-            bestMoves = []
-            for p, r, c in self.availableTitle:
-                title = title3dArray[p][r][c]
-                preserveState = copy.copy(title.state)
-                title.state = playerTitleState
-                moveEvaluation = MinMax(title3dArray, (p, r, c),
-                                        minTitleState=oponentTitleState,
-                                        maxTitleState=playerTitleState,
-                                        isMax=False,
-                                        maxDepth=self.maxDepth,
-                                        depthWeigh=self.depthWeigh,
-                                        heuristicWeigh=self.heuristicWeigh)
-                title.state = preserveState
+            if moveEvaluation > bestEvaluation:
+                bestEvaluation = moveEvaluation
+                bestMoves = [[p, r, c]]
+                calculatingQueue.put([p, r, c])
+            elif moveEvaluation == bestEvaluation:
+                calculatingQueue.put([p, r, c])
+                bestMoves += [[p, r, c]]
 
-                if moveEvaluation > bestEvaluation:
-                    bestEvaluation = moveEvaluation
-                    bestMoves = [[p, r, c]]
-                    calculatingQueue.put([p, r, c])
-                elif moveEvaluation == bestEvaluation:
-                    calculatingQueue.put([p, r, c])
-                    bestMoves += [[p, r, c]]
+        queue.put(rd.choice(bestMoves))
 
-            bestMoveQueue.put(rd.choice(bestMoves))
-
-            timeEnd = time.time()
-            totalTime = (timeEnd - timeStart)
-            print("Move calculated in ", totalTime, " seconds")
+        timeEnd = time.time()
+        totalTime = (timeEnd - timeStart)
+        print("Move calculated in ", totalTime, " seconds")
 
     def prepareAvailableMove(self, title3dArray):
         self.availableTitle = []
