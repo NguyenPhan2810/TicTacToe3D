@@ -104,12 +104,8 @@ class MinMaxController(Controller):
         self.findBestMoveProcess = None
         self.bestMoveQueue = multiprocessing.Queue()
         self.calculatingMoveQueue = multiprocessing.Queue()
-        self.bestMove = None
-        self.calculatingMove = None
-        self.title3dArray = None
-        self.gameState = None
-
         self.availableTitle = None
+
         self.isSelectTitle = False
         self.timeTaken = 0.0
         self.maxTimeWait = cfg.waitingTime
@@ -120,6 +116,8 @@ class MinMaxController(Controller):
         self.heuristicWeigh = heuristicWeigh
         self.evaluationScore = evaluationScore
 
+        self.bestMove = None
+        self.calculatingMove = None
 
     def reset(self):
         Controller.reset(self)
@@ -146,10 +144,9 @@ class MinMaxController(Controller):
 
         if self.findBestMoveProcess is None:
             if  self.bestMove is None:
-                self.title3dArray = title3dArray
-                self.gameState = gameState
+                print(self, " Started finding move")
                 self.findBestMoveProcess = multiprocessing.Process(target=self.findBestMove,
-                                                                   args=(self.bestMoveQueue, self.calculatingMoveQueue),
+                                                                   args=(title3dArray, gameState, self.bestMoveQueue, self.calculatingMoveQueue),
                                                                    daemon=True)
                 self.findBestMoveProcess.start()
         elif not self.findBestMoveProcess.is_alive():
@@ -184,7 +181,7 @@ class MinMaxController(Controller):
             return True
         return False
 
-    def findBestMove(self,
+    def findBestMove(self, title3dArray, gameState,
                      queue: multiprocessing.Queue,
                      calculatingQueue: multiprocessing.Queue):
         print("Started finding move")
@@ -194,8 +191,6 @@ class MinMaxController(Controller):
         n = cfg.nTitles
 
         playerTitleState = oponentTitleState = Title.State.default
-        title3dArray = self.title3dArray
-        gameState = self.gameState
         if gameState == gameState.player1:
             playerTitleState = Title.State.player1
             oponentTitleState = Title.State.player2
