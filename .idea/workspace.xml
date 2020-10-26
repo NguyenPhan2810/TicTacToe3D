@@ -22,7 +22,13 @@
     <list default="true" id="54a41cc1-057c-4ada-a7c4-f5e95c47532c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
 <<<<<<< HEAD
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/Source/Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/Source/Controller.py" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/Source/GameObject.py" beforeDir="false" afterPath="$PROJECT_DIR$/Source/GameObject.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/PlayGround.py" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PlayGround.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/PlayState.py" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PlayState.py" afterDir="false" />
+>>>>>>> parent of 28660d2... [Modify]
 =======
       <change beforePath="$PROJECT_DIR$/Source/GameObject.py" beforeDir="false" afterPath="$PROJECT_DIR$/Source/GameObject.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/PlayGround.py" beforeDir="false" afterPath="$PROJECT_DIR$/Source/PlayGround.py" afterDir="false" />
@@ -117,6 +123,7 @@
     </state>
     <state width="1579" height="466" key="DebuggerActiveHint/0.0.1920.1040@0.0.1920.1040" timestamp="1603510795487" />
 <<<<<<< HEAD
+<<<<<<< HEAD
     <state width="1899" height="429" key="GridCell.Tab.0.bottom" timestamp="1603707285141">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -133,6 +140,24 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1899" height="429" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1603707285141" />
+=======
+    <state width="1899" height="429" key="GridCell.Tab.0.bottom" timestamp="1603703611432">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="429" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1603703611432" />
+    <state width="1899" height="429" key="GridCell.Tab.0.center" timestamp="1603703611432">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="429" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1603703611432" />
+    <state width="1899" height="429" key="GridCell.Tab.0.left" timestamp="1603703611432">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="429" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1603703611432" />
+    <state width="1899" height="429" key="GridCell.Tab.0.right" timestamp="1603703611432">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="429" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1603703611432" />
+>>>>>>> parent of 28660d2... [Modify]
 =======
     <state width="1899" height="429" key="GridCell.Tab.0.bottom" timestamp="1603703611432">
       <screen x="0" y="0" width="1920" height="1040" />
