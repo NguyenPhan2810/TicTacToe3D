@@ -145,7 +145,7 @@ class MinMaxController(Controller):
                                                                    daemon=True)
                 self.findBestMoveProcess.start()
                 pygame.time.wait(10)
-                self.startFindingMoveQueue.
+                self.startFindingMoveQueue
                 self.startFindingMoveQueue.put(title3dArray)
         elif not self.findBestMoveProcess.is_alive():
             self.findBestMoveProcess = None
