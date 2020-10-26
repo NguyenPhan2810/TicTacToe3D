@@ -104,12 +104,10 @@ class MinMaxController(Controller):
         self.findBestMoveProcess = None
         self.bestMoveQueue = multiprocessing.Queue()
         self.calculatingMoveQueue = multiprocessing.Queue()
+        self.startFindingMoveQueue = multiprocessing.Queue()
         self.bestMove = None
         self.calculatingMove = None
-        self.title3dArray = None
-        self.gameState = None
 
-        self.availableTitle = None
         self.isSelectTitle = False
         self.timeTaken = 0.0
         self.maxTimeWait = cfg.waitingTime
@@ -120,7 +118,6 @@ class MinMaxController(Controller):
         self.heuristicWeigh = heuristicWeigh
         self.evaluationScore = evaluationScore
 
-
     def reset(self):
         Controller.reset(self)
 
@@ -128,7 +125,6 @@ class MinMaxController(Controller):
         self.findBestMoveProcess = None
         self.bestMoveQueue = multiprocessing.Queue()
         self.calculatingMoveQueue = multiprocessing.Queue()
-        self.availableTitle = None
 
         self.isSelectTitle = False
         self.timeTaken = 0.0
@@ -141,21 +137,23 @@ class MinMaxController(Controller):
             self.findBestMoveProcess.terminate()
 
     def activeTitle(self, title3dArray, gameState):
-        if self.availableTitle is None:
-            self.prepareAvailableMove(title3dArray)
 
         if self.findBestMoveProcess is None:
             if  self.bestMove is None:
-                self.title3dArray = title3dArray
-                self.gameState = gameState
-                self.findBestMoveProcess = multiprocessing.Process(target=self.findBestMove,
-                                                                   args=(self.bestMoveQueue, self.calculatingMoveQueue),
+                self.findBestMoveProcess = multiprocessing.Process(target=findBestMove,
+                                                                   args=(self.startFindingMoveQueue, self.bestMoveQueue, self.calculatingMoveQueue),
                                                                    daemon=True)
                 self.findBestMoveProcess.start()
+                pygame.time.wait(10)
+                self.startFindingMoveQueue.
+                self.startFindingMoveQueue.put(title3dArray)
         elif not self.findBestMoveProcess.is_alive():
-            self.bestMove = self.bestMoveQueue.get()
             self.findBestMoveProcess = None
-            
+
+        if self.bestMove is None:
+            try: self.bestMove = self.bestMoveQueue.get_nowait()
+            except: pass
+
         self.isCalculating = self.bestMove is None
 
         if not self.isStartCalculating and self.isCalculating and not self.isSelectTitle:
@@ -178,15 +176,28 @@ class MinMaxController(Controller):
             self.isSelectTitle = False
             self.bestMove = None
             self.isCalculating = False
-            self.availableTitle = None
             self.timeTaken = 0.0
             self.isStartCalculating = False
             return True
         return False
 
-    def findBestMove(self,
-                     queue: multiprocessing.Queue,
-                     calculatingQueue: multiprocessing.Queue):
+    def update(self, deltaTime: float):
+        Controller.update(self, deltaTime)
+
+        self.timeTaken += deltaTime
+
+        if self.timeTaken > self.maxTimeWait and not self.isSelectTitle and self.isStartCalculating:
+            self.isSelectTitle = True
+
+
+def findBestMove(
+                 startFindingMoveQueue: multiprocessing.Queue,
+                 queue: multiprocessing.Queue,
+                 calculatingQueue: multiprocessing.Queue):
+
+    while True:
+        title3dArray, gameState, availableTitles, maxDepth, maxWeigh, heuristicWeigh = startFindingMoveQueue.get()
+
         print("Started finding move")
         timeStart = time.time()
 
@@ -194,8 +205,6 @@ class MinMaxController(Controller):
         n = cfg.nTitles
 
         playerTitleState = oponentTitleState = Title.State.default
-        title3dArray = self.title3dArray
-        gameState = self.gameState
         if gameState == gameState.player1:
             playerTitleState = Title.State.player1
             oponentTitleState = Title.State.player2
@@ -203,9 +212,20 @@ class MinMaxController(Controller):
             playerTitleState = Title.State.player2
             oponentTitleState = Title.State.player1
 
+        availableTitle = []
+        n = cfg.nTitles
+        for p in range(0, n):
+            for r in range(0, n):
+                for c in range(0, n):
+                    title = title3dArray[p][r][c]
+                    if title.state != Title.State.default:
+                        continue
+
+                    availableTitle += [[p, r, c]]
+
         # Traverse through all possible move
         bestMoves = []
-        for p, r, c in self.availableTitle:
+        for p, r, c in availableTitles:
             title = title3dArray[p][r][c]
             preserveState = copy.copy(title.state)
             title.state = playerTitleState
@@ -213,9 +233,9 @@ class MinMaxController(Controller):
                                     minTitleState=oponentTitleState,
                                     maxTitleState=playerTitleState,
                                     isMax=False,
-                                    maxDepth=self.maxDepth,
-                                    depthWeigh=self.depthWeigh,
-                                    heuristicWeigh=self.heuristicWeigh)
+                                    maxDepth=maxDepth,
+                                    depthWeigh=depthWeigh,
+                                    heuristicWeigh=heuristicWeigh)
             title.state = preserveState
 
             if moveEvaluation > bestEvaluation:
@@ -231,24 +251,3 @@ class MinMaxController(Controller):
         timeEnd = time.time()
         totalTime = (timeEnd - timeStart)
         print("Move calculated in ", totalTime, " seconds")
-
-    def prepareAvailableMove(self, title3dArray):
-        self.availableTitle = []
-        n = cfg.nTitles
-        for p in range(0, n):
-            for r in range(0, n):
-                for c in range(0, n):
-                    title = title3dArray[p][r][c]
-                    if title.state != Title.State.default:
-                        continue
-
-                    self.availableTitle += [[p, r, c]]
-
-    def update(self, deltaTime: float):
-        Controller.update(self, deltaTime)
-
-        self.timeTaken += deltaTime
-
-        if self.timeTaken > self.maxTimeWait and not self.isSelectTitle and self.isStartCalculating:
-            self.isSelectTitle = True
-
