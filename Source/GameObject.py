@@ -20,7 +20,7 @@ class GameObject:
         self.globalTransform = Transform()
         self.prevGlobalTransform = Transform()
         self.meshData = None
-        self.transformedVertices = None
+        self.transformedVerticesArray = None
 
         self.children = []
         self.parent = None
@@ -67,7 +67,7 @@ class GameObject:
             child.lateUpdate(deltaTime)
 
         if self.meshData is not None and self.prevGlobalTransform != self.globalTransform:
-            self.transformedVertices = self.glCalculateTransform(self.meshData.vertices)
+           self.glPreprocessVertices()
 
     def draw(self):
         if self.meshData is not None:
@@ -75,12 +75,37 @@ class GameObject:
         for i in range(0, len(self.children)):
             self.children[i].draw()
 
+    def glDraw(self):
+        if self.transformedVerticesArray is None:
+            return
+
+        vertexRange = range(4)
+        colorArray = self.meshData.surfaceColors / 255
+
+        glBegin(GL_QUADS)
+        index = 0
+        for surface in range(len(self.meshData.surfaces)):
+            glColor3fv(colorArray[surface])
+            for vertex in vertexRange:
+                glVertex3f(*self.transformedVerticesArray[index])
+                index += 1
+        glEnd()
+
     def drawPicking(self):
         if self.meshData is not None:
             self.glDrawPicking()
         for i in range(0, len(self.children)):
             self.children[i].drawPicking()
 
+    def glDrawPicking(self):
+        if self.transformedVerticesArray is None:
+            return
+
+        glBegin(GL_QUADS)
+        glColor3fv(np.array(self.idToColor()) / 255)
+        for vertex in range(len(self.transformedVerticesArray)):
+            glVertex3f(*self.transformedVerticesArray[vertex])
+        glEnd()
 
     # Return true if this object or children picked
     def updatePicking(self, pickedColor):
@@ -115,7 +140,8 @@ class GameObject:
                 child.globalTransform.position = np.matmul(rotationMatrix, child.globalTransform.position)
                 child.updateChildRotation(rotationMatrix)
 
-    def glCalculateTransform(self, vertices):
+    def glPreprocessVertices(self):
+        vertices = self.meshData.vertices
         vertices = vertices.transpose()
         rotMat = rotationMatrix(self.globalTransform.rotation)
         scaleMat = scaleMatrix(self.globalTransform.scale)
@@ -124,38 +150,18 @@ class GameObject:
         vertices = vertices.transpose()
         vertices = vertices + self.globalTransform.position
 
-        return vertices
+        vertexArray = []
+        for surface in self.meshData.surfaces:
+            for vertex in surface:
+                vertexArray += [vertices[vertex]]
 
-    def glDraw(self):
-        if self.transformedVertices is None:
-            return
-
-        vertexRange = range(4)
-        colorArray = self.meshData.surfaceColors / 255
-
-        glBegin(GL_QUADS)
-        for surface in range(len(self.meshData.surfaces)):
-            glColor3fv(colorArray[surface])
-            for vertex in vertexRange:
-                glVertex3fv(self.transformedVertices[self.meshData.surfaces[surface][vertex]])
-        glEnd()
+        self.transformedVerticesArray = vertexArray
 
     def idToColor(self):
         r = (self.id & 0x0000ff) >> 0
         g = (self.id & 0x00ff00) >> 8
         b = (self.id & 0xff0000) >> 16
         return (r, g, b)
-
-    def glDrawPicking(self):
-        if self.transformedVertices is None:
-            return
-        glColor3fv(np.array(self.idToColor()) / 255)
-        vertexRange = range(4)
-        glBegin(GL_QUADS)
-        for surface in range(len(self.meshData.surfaces)):
-            for vertex in vertexRange:
-                glVertex3fv(self.transformedVertices[self.meshData.surfaces[surface][vertex]])
-        glEnd()
 
     def move(self, direction):
         self.transform.position += np.array(direction)
