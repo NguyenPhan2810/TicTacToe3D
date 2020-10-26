@@ -83,7 +83,8 @@ class PlayState(BaseState):
         return False
 
     def update(self, deltaTime: float) -> bool:
-        pygame.display.set_caption("FPS: " + str(1 // deltaTime))
+        super().update(deltaTime)
+
         # Terminal check
         if self.exit:
             from MenuState import MenuState
@@ -115,6 +116,7 @@ class PlayState(BaseState):
         return True
 
     def lateUpdate(self, deltaTime: float):
+        super().lateUpdate(deltaTime)
         self.objectRoot.lateUpdate(deltaTime)
 
     def render(self):

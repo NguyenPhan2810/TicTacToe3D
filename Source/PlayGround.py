@@ -95,6 +95,8 @@ class PlayGround(GameObject):
         self.selectionCount = 0
         self.activeTitleIndex = None
         self.activeTitlePreservedColor = None
+        self.mostRecentSelectedTitle = None
+        self.mostRecentSelectedTitleColor = None
 
         self.title3dArray = []
         for i in range(0, n):
@@ -126,15 +128,16 @@ class PlayGround(GameObject):
             self.planes[i].setColor(cfg.planeColor[i])
 
     def lateUpdate(self, deltaTime):
-        GameObject.lateUpdate(self, deltaTime)
+        super().lateUpdate(deltaTime)
         self.totalTime += deltaTime
+        print(self.totalTime, deltaTime)
 
-        if self.activeTitleIndex is not None:
+        if self.activeTitleIndex:
             title = self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]]
             newColor = np.array(cfg.activeTitleColor) + cfg.activeTitleColorPulseAmount * sin(cfg.activeTitleColorPulseRate * self.totalTime)
             title.setColor(newColor)
 
-        if self.terminalTitles is not None:
+        if self.terminalTitles:
             for index in self.terminalTitles:
                 title = self.title3dArray[index[0]][index[1]][index[2]]
                 if self.terminalTitlesColor is None:
@@ -145,6 +148,14 @@ class PlayGround(GameObject):
                 g += change
                 b += change
                 title.setColor((r, g, b))
+
+        if self.mostRecentSelectedTitle:
+            title = self.mostRecentSelectedTitle
+            if self.mostRecentSelectedTitleColor is None:
+                self.mostRecentSelectedTitleColor = title.color
+            change = math.sin(self.totalTime * cfg.activeTitleColorPulseRate) * cfg.activeTitleColorPulseAmount
+            color = np.array(self.mostRecentSelectedTitleColor) + change
+            title.setColor(color)
 
     def setActiveTitle(self, plane=None, row=None, col=None):
         index = self.activeTitleIndex
@@ -162,7 +173,6 @@ class PlayGround(GameObject):
             self.activeTitleIndex = None
 
         if plane is None or row is None or col is None:
-            self.totalTime = 0.0
             return
 
         # If no players has taken the title yet then choose it
@@ -185,6 +195,10 @@ class PlayGround(GameObject):
             result = self.endgameCheck()
             self.setActiveTitle()
             title.transform.scale *= cfg.selectedTitleScaleMultiplier
+            if self.mostRecentSelectedTitle:
+                self.mostRecentSelectedTitle.setColor(self.mostRecentSelectedTitleColor)
+                self.mostRecentSelectedTitleColor = None
+            self.mostRecentSelectedTitle = title
 
             color = cfg.player1Color if state == Title.State.player1 else cfg.player2Color
             title.setColor(color)

@@ -66,6 +66,8 @@ class Game:
         self.statesStackchanged = True
 
     def update(self, deltaTime: float):
+        pygame.display.set_caption("Tic-Tac-Toe 3D | Nguyen Phan | FPS: " + str(1 // deltaTime))
+
         stackSize = len(self.statesStack)
         for i in range(0, stackSize):
             state = self.statesStack[i]

@@ -57,8 +57,6 @@ class HumanController(Controller):
                 self.isMouseMoved = True
 
     def update(self, deltaTime: float):
-        Controller.update(self, deltaTime)
-
         if self.isMouseMoved:
             self.mouseHover()
         if self.isMouseUp and not self.isMouseMoved:
@@ -180,7 +178,7 @@ class MinMaxController(Controller):
         return False
 
     def update(self, deltaTime: float):
-        Controller.update(self, deltaTime)
+        super().update(deltaTime)
 
         self.timeTaken += deltaTime
 

@@ -32,13 +32,13 @@ timePerFrame = 1 / 60
 # Min-Max alg
 heuristicWeigh = 5
 heuristicPriorityWeigh = 100
-maxDepthSearch  = 2
+maxDepthSearch  = 1
 depthWeight = 1
 minmaxEvaluationScore = 1000
 alphabetaPruning = True
 
 # MinMaxController
-waitingTime = 4
+waitingTime = 0
 
 # Main menu
 mainmenuTextColor = (255, 255, 255)
