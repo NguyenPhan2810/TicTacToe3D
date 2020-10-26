@@ -1,7 +1,7 @@
 import pygame
 
 # Playground
-nTitles = 3 # must be > 1
+nTitles = 4 # must be > 1
 
 titleXThickness = 0.1
 titleOThickness = 0.2
@@ -15,6 +15,7 @@ terminalTitleColorChangeFreq = 5
 terminalTitleColorChangeAmount = 70
 
 playGroundZoomAmount = 1.2
+playGroundMaxRotationX = 70
 mouseRotationSensitivity = 0.3
 titlesPadding = 1
 

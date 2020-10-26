@@ -22,9 +22,11 @@ class PlayState(BaseState):
         self.players = [player1Controller, player2Controller]
         self.playGround = PlayGround()
         self.playGround.setParent(self.objectRoot)
+
         for player in self.players:
             player.setParent(self.objectRoot)
 
+        self.playgroundRotationX = 0
         self.mouseHold = False
 
     def constructor(self):
@@ -36,6 +38,7 @@ class PlayState(BaseState):
         glFrontFace(GL_CW)
         glTranslatef(0, 0, cfg.cameraZOffset)
         glRotatef(cfg.cameraXRotate, 1, 0, 0)
+        self.playgroundRotationX = cfg.cameraXRotate
         glClearColor(cfg.backgroundColor[0] / 255, cfg.backgroundColor[1] / 255, cfg.backgroundColor[2] / 255, 1)
 
         self.objectRoot.reset()
@@ -49,6 +52,7 @@ class PlayState(BaseState):
         self.state = GameStatus.player1
         self.state = GameStatus(0)
 
+        self.playgroundRotationX = 0
         self.mouseHold = False
         self.pushState = None
         self.exit = False
@@ -91,7 +95,11 @@ class PlayState(BaseState):
             dx, dy = pygame.mouse.get_rel()
             rotationX = dy * cfg.mouseRotationSensitivity
             rotationY = dx * cfg.mouseRotationSensitivity
-            glRotatef(abs(rotationX), rotationX, 0, 0)
+            self.playgroundRotationX += rotationX
+            if -cfg.playGroundMaxRotationX <= self.playgroundRotationX <= cfg.playGroundMaxRotationX:
+                glRotatef(rotationX, 1, 0, 0)
+            self.playgroundRotationX = max(self.playgroundRotationX, -cfg.playGroundMaxRotationX)
+            self.playgroundRotationX = min(self.playgroundRotationX, cfg.playGroundMaxRotationX)
             self.playGround.transform.rotation[1] -= rotationY
 
         # Check picking

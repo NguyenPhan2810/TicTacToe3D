@@ -120,8 +120,10 @@ class GameObject:
                 return False
 
     def updateTransform(self):
-        if self.parent is not None:
-            self.prevGlobalTransform = copy.deepcopy(self.globalTransform)
+        self.prevGlobalTransform = copy.deepcopy(self.globalTransform)
+        if self.parent is None:
+            self.globalTransform = self.transform
+        else:
             self.globalTransform.scale = self.parent.globalTransform.scale * self.transform.scale
             self.globalTransform.position = (self.parent.globalTransform.position + self.transform.position * self.parent.globalTransform.scale)
             self.globalTransform.rotation = self.parent.globalTransform.rotation + self.transform.rotation
@@ -130,14 +132,8 @@ class GameObject:
         rotMat = rotationMatrix(self.globalTransform.rotation)
         self.globalTransform.position = np.matmul(rotMat, self.globalTransform.position)
 
-        if self.children is not None:
-            for child in self.children:
-                child.updateRotation()
-
-    def updateChildRotation(self, rotationMatrix):
-            for child in self.children:
-                child.globalTransform.position = np.matmul(rotationMatrix, child.globalTransform.position)
-                child.updateChildRotation(rotationMatrix)
+        for child in self.children:
+            child.updateRotation()
 
     def glPreprocessVertices(self):
         vertices = self.meshData.vertices
