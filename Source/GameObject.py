@@ -26,6 +26,7 @@ class GameObject:
         self.parent = None
 
         self.isPicked = False # If this object is picked by the mouse or not
+        self.isPickable = False
         self.id = GameObject.id
         GameObject.id += 1
 
@@ -91,7 +92,7 @@ class GameObject:
         glEnd()
 
     def drawPicking(self):
-        if self.meshData is not None:
+        if self.meshData is not None and self.isPickable:
             self.glDrawPicking()
         for i in range(0, len(self.children)):
             self.children[i].drawPicking()
@@ -108,7 +109,7 @@ class GameObject:
 
     # Return true if this object or children picked
     def updatePicking(self, pickedColor):
-        if self.idToColor() == pickedColor:
+        if self.idToColor() == pickedColor and self.isPickable:
             self.isPicked = True
             return True
         else:

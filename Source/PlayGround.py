@@ -113,6 +113,13 @@ class PlayGround(GameObject):
         self.terminalTitles = None
         self.terminalTitlesColor = None
         self.resetColor()
+        self.resetPicking()
+
+    def resetPicking(self):
+        for plane in self.title3dArray:
+            for row in plane:
+                for title in row:
+                    title.isPickable = True
 
     def resetColor(self):
         for i in range(0, cfg.nTitles):
@@ -181,6 +188,7 @@ class PlayGround(GameObject):
 
             color = cfg.player1Color if state == Title.State.player1 else cfg.player2Color
             title.setColor(color)
+            title.isPickable = False
 
             if result is not None:
                 return result

@@ -33,6 +33,8 @@ class PlayState(BaseState):
         self.objectRoot.constructor()
 
         pygame.display.set_mode(cfg.displaySize, DOUBLEBUF | OPENGL)
+        pygame.display.gl_set_attribute(GL_MULTISAMPLEBUFFERS, 4)
+        glEnable(GL_MULTISAMPLE)
         glEnable(GL_DEPTH_TEST)
         gluPerspective(cfg.FOV, cfg.displayAspectRatio, cfg.nearClippingPlane, cfg.farClippingPlane)
         glFrontFace(GL_CW)
@@ -81,6 +83,7 @@ class PlayState(BaseState):
         return False
 
     def update(self, deltaTime: float) -> bool:
+        pygame.display.set_caption("FPS: " + str(1 // deltaTime))
         # Terminal check
         if self.exit:
             from MenuState import MenuState
@@ -100,7 +103,6 @@ class PlayState(BaseState):
                 glRotatef(rotationX, 1, 0, 0)
             else:
                 self.playgroundRotationX -= rotationX
-            print(self.playgroundRotationX)
             self.playGround.transform.rotation[1] -= rotationY
 
         # Check picking

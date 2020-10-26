@@ -27,7 +27,7 @@ nearClippingPlane = 0.1
 farClippingPlane = 50.0
 cameraZOffset = -7
 cameraXRotate = 22
-timePerFrame = 1 / 30
+timePerFrame = 1 / 60
 
 # Min-Max alg
 heuristicMaxWeigh = 1
@@ -55,9 +55,11 @@ colorSpace = [
     [120, 178, 210],
     [150, 220, 100],
     [110, 150, 100],
-    [140, 210, 240],
     [210, 130, 190],
-    [200, 200, 200],
+    [255, 120, 160],
+    [189, 179, 120],
+    [210, 120, 100],
+    [128, 245, 140]
 ]
 if nTitles > len(colorSpace):
     colorSpace *= nTitles // len(colorSpace)
