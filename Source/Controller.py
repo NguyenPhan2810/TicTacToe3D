@@ -104,13 +104,9 @@ class MinMaxController(Controller):
         self.findBestMoveProcess = None
         self.bestMoveQueue = multiprocessing.Queue()
         self.calculatingMoveQueue = multiprocessing.Queue()
-<<<<<<< HEAD
         self.startFindingMoveQueue = multiprocessing.Queue()
         self.bestMove = None
         self.calculatingMove = None
-=======
-        self.availableTitle = None
->>>>>>> parent of 28660d2... [Modify]
 
         self.isSelectTitle = False
         self.timeTaken = 0.0
@@ -122,12 +118,6 @@ class MinMaxController(Controller):
         self.heuristicWeigh = heuristicWeigh
         self.evaluationScore = evaluationScore
 
-<<<<<<< HEAD
-=======
-        self.bestMove = None
-        self.calculatingMove = None
-
->>>>>>> parent of 28660d2... [Modify]
     def reset(self):
         Controller.reset(self)
 
@@ -150,14 +140,8 @@ class MinMaxController(Controller):
 
         if self.findBestMoveProcess is None:
             if  self.bestMove is None:
-<<<<<<< HEAD
                 self.findBestMoveProcess = multiprocessing.Process(target=findBestMove,
                                                                    args=(self.startFindingMoveQueue, self.bestMoveQueue, self.calculatingMoveQueue),
-=======
-                print(self, " Started finding move")
-                self.findBestMoveProcess = multiprocessing.Process(target=self.findBestMove,
-                                                                   args=(title3dArray, gameState, self.bestMoveQueue, self.calculatingMoveQueue),
->>>>>>> parent of 28660d2... [Modify]
                                                                    daemon=True)
                 self.findBestMoveProcess.start()
                 pygame.time.wait(10)
@@ -197,7 +181,6 @@ class MinMaxController(Controller):
             return True
         return False
 
-<<<<<<< HEAD
     def update(self, deltaTime: float):
         Controller.update(self, deltaTime)
 
@@ -215,11 +198,6 @@ def findBestMove(
     while True:
         title3dArray, gameState, availableTitles, maxDepth, maxWeigh, heuristicWeigh = startFindingMoveQueue.get()
 
-=======
-    def findBestMove(self, title3dArray, gameState,
-                     queue: multiprocessing.Queue,
-                     calculatingQueue: multiprocessing.Queue):
->>>>>>> parent of 28660d2... [Modify]
         print("Started finding move")
         timeStart = time.time()
 
