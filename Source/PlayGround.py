@@ -112,6 +112,8 @@ class PlayGround(GameObject):
 
         self.totalTime = 0.0
         self.selectionCount = 0
+        self.mostRecentSelectedTitleColor = None
+        self.mostRecentSelectedTitle = None
         self.terminalTitles = None
         self.terminalTitlesColor = None
         self.resetColor()
@@ -130,7 +132,6 @@ class PlayGround(GameObject):
     def lateUpdate(self, deltaTime):
         super().lateUpdate(deltaTime)
         self.totalTime += deltaTime
-        print(self.totalTime, deltaTime)
 
         if self.activeTitleIndex:
             title = self.title3dArray[self.activeTitleIndex[0]][self.activeTitleIndex[1]][self.activeTitleIndex[2]]

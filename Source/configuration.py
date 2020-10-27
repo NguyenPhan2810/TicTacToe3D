@@ -9,7 +9,7 @@ titleOSegments = 6
 
 activeTitleColorPulseRate = 20
 activeTitleColorPulseAmount = 100
-selectedTitleScaleMultiplier = 1.1
+selectedTitleScaleMultiplier = 1.5
 
 terminalTitleColorChangeFreq = 5
 terminalTitleColorChangeAmount = 70
@@ -17,7 +17,7 @@ terminalTitleColorChangeAmount = 70
 playGroundZoomAmount = 1.2
 playGroundMaxRotationX = 70
 mouseRotationSensitivity = 0.3
-titlesPadding = 1
+titlesPadding = 2
 
 # Display
 displaySize = (800, 800)
@@ -38,7 +38,7 @@ minmaxEvaluationScore = 1000
 alphabetaPruning = True
 
 # MinMaxController
-waitingTime = 0
+waitingTime = 3
 
 # Main menu
 mainmenuTextColor = (255, 255, 255)
@@ -50,14 +50,12 @@ guideImageFilename = "Resources/Images/guide.png"
 # Colors
 import random as rd
 colorSpace = [
-    [120, 178, 210],
     [150, 220, 100],
     [110, 150, 100],
-    [210, 130, 190],
-    [255, 120, 160],
     [189, 179, 120],
-    [210, 120, 100],
-    [128, 245, 140]
+    [128, 180, 140],
+    [120, 190, 190],
+    [120, 220, 180],
 ]
 if nTitles > len(colorSpace):
     colorSpace *= nTitles // len(colorSpace)
