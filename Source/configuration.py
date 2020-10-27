@@ -34,7 +34,7 @@ heuristicWeigh = 5
 heuristicPriorityWeigh = 100
 maxDepthSearch  = 1
 depthWeight = 1
-minmaxEvaluationScore = 1000
+minmaxEvaluationScore = 10000
 alphabetaPruning = True
 
 # MinMaxController

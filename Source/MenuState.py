@@ -141,7 +141,7 @@ class ModeSelectionState(BaseState):
         pvp.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(human, human),))
         pvm.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(human, minmax),))
         mvp.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(minmax, human),))
-        mvm.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(minmax, minmax),))
+        mvm.setOnClickedCallback(target=self.buttonClickedCallback, args=(PlayState.PlayState(minmax, MinMaxController()),))
 
         self.buttons = [pvp, pvm, mvp, mvm]
 
